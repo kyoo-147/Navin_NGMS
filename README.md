@@ -2,6 +2,13 @@
 
 <img src="assets/ngms-logo.png" alt="NGMS — the next generation of mail infrastructure" width="520">
 
+[![Homepage](https://img.shields.io/badge/Homepage-merak.navinresearch.com-111827?style=flat-square)](https://merak.navinresearch.com/)
+[![Tech](https://img.shields.io/badge/Tech-merak.navinresearch.com%2Ftech-334155?style=flat-square)](https://merak.navinresearch.com/tech)
+[![NGMS Blog](https://img.shields.io/badge/Blog-NGMS-475569?style=flat-square)](https://merak.navinresearch.com/blog/ngms)
+[![License](https://img.shields.io/badge/License-PolyForm%20Noncommercial-64748b?style=flat-square)](LICENSE)
+[![Security](https://img.shields.io/badge/Security-Policy-64748b?style=flat-square)](SECURITY.md)
+[![Contributing](https://img.shields.io/badge/Contributing-Guide-64748b?style=flat-square)](CONTRIBUTING.md)
+
 <p><strong>The next generation of mail infrastructure</strong></p>
 
 <p>From an empty server to secure, automated, AI-operated email in minutes.</p>
