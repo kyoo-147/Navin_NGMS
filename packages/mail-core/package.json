@@ -1,0 +1,84 @@
+{
+  "name": "@navin/mail-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Domain logic, thread reader, drafts, submissions, search query parsing, HTML security, contacts, calendar, and offline client for Navin Mail",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./security": {
+      "types": "./dist/security/index.d.ts",
+      "import": "./dist/security/index.js",
+      "default": "./dist/security/index.js"
+    },
+    "./thread": {
+      "types": "./dist/thread/index.d.ts",
+      "import": "./dist/thread/index.js",
+      "default": "./dist/thread/index.js"
+    },
+    "./draft": {
+      "types": "./dist/draft/index.d.ts",
+      "import": "./dist/draft/index.js",
+      "default": "./dist/draft/index.js"
+    },
+    "./submission": {
+      "types": "./dist/submission/index.d.ts",
+      "import": "./dist/submission/index.js",
+      "default": "./dist/submission/index.js"
+    },
+    "./query": {
+      "types": "./dist/query/index.d.ts",
+      "import": "./dist/query/index.js",
+      "default": "./dist/query/index.js"
+    },
+    "./realtime": {
+      "types": "./dist/realtime/index.d.ts",
+      "import": "./dist/realtime/index.js",
+      "default": "./dist/realtime/index.js"
+    },
+    "./contacts": {
+      "types": "./dist/contacts/index.d.ts",
+      "import": "./dist/contacts/index.js",
+      "default": "./dist/contacts/index.js"
+    },
+    "./calendar": {
+      "types": "./dist/calendar/index.d.ts",
+      "import": "./dist/calendar/index.js",
+      "default": "./dist/calendar/index.js"
+    },
+    "./capabilities": {
+      "types": "./dist/capabilities/index.d.ts",
+      "import": "./dist/capabilities/index.js",
+      "default": "./dist/capabilities/index.js"
+    },
+    "./client": {
+      "types": "./dist/client/index.d.ts",
+      "import": "./dist/client/index.js",
+      "default": "./dist/client/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@navin/contracts": "workspace:*",
+    "@navin/mail-gateway": "workspace:*",
+    "@navin/mail-store": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.4",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}
