@@ -1,0 +1,35 @@
+{
+  "name": "@navin/engine-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Replaceable mail-engine adapter boundary and Stalwart admin adapter for the Navin platform",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./stalwart": {
+      "types": "./dist/stalwart/index.d.ts",
+      "import": "./dist/stalwart/index.js",
+      "default": "./dist/stalwart/index.js"
+    },
+    "./testing": {
+      "types": "./dist/testing/index.d.ts",
+      "import": "./dist/testing/index.js",
+      "default": "./dist/testing/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json"
+  }
+}
