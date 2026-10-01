@@ -1,0 +1,23 @@
+{
+  "id": "invalid-category-fixture",
+  "name": "Invalid Category Fixture",
+  "url": "https://github.com/example/invalid-category.git",
+  "pinned_commit": "0123456789abcdef0123456789abcdef01234567",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "not-allowed-category",
+  "role": "Test fixture with disallowed category",
+  "studied_paths": [
+    "src"
+  ],
+  "studied_behavior": "Studied behavior.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Fixture with disallowed category."
+  ],
+  "reviewer": "Test Reviewer",
+  "verified_at": "2026-10-01T09:00:00+07:00"
+}

@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Navin Reference Record Schema",
+  "description": "Schema definition for high-quality reference records stored in docs/references/",
+  "type": "object",
+  "required": [
+    "id",
+    "name",
+    "url",
+    "pinned_commit",
+    "license",
+    "license_files",
+    "category",
+    "role",
+    "studied_paths",
+    "studied_behavior",
+    "code_imported",
+    "attribution_required",
+    "caveats",
+    "reviewer",
+    "verified_at"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "url": {
+      "type": "string",
+      "pattern": "^https?://.+"
+    },
+    "pinned_commit": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "license": {
+      "type": "string",
+      "minLength": 1
+    },
+    "license_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "reference-only",
+        "architecture-reference",
+        "standards-reference",
+        "dependency-candidate",
+        "external-engine"
+      ]
+    },
+    "role": {
+      "type": "string",
+      "minLength": 1
+    },
+    "studied_paths": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "studied_behavior": {
+      "type": "string",
+      "minLength": 1
+    },
+    "code_imported": {
+      "type": "boolean",
+      "const": false
+    },
+    "attribution_required": {
+      "type": "boolean"
+    },
+    "caveats": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 1
+    },
+    "reviewer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verified_at": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "additionalProperties": true
+}

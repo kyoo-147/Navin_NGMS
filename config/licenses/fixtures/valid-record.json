@@ -1,0 +1,23 @@
+{
+  "id": "valid-fixture",
+  "name": "Valid Fixture Reference",
+  "url": "https://github.com/example/valid-fixture.git",
+  "pinned_commit": "0123456789abcdef0123456789abcdef01234567",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Test fixture for valid reference",
+  "studied_paths": [
+    "src/core"
+  ],
+  "studied_behavior": "Valid behavior description for test suite.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Fixture only; no runtime usage."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:00:00+07:00"
+}

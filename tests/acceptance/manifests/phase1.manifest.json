@@ -1,0 +1,139 @@
+{
+  "manifestVersion": 1,
+  "name": "navin-phase1-acceptance",
+  "description": "W05 Phase 1 acceptance matrix. Executors that need disposable infrastructure or packaged artifacts report BLOCKED or NOT_RUN rather than faking success.",
+  "allow": ["127.0.0.1", "localhost"],
+  "entries": [
+    {
+      "id": "harness.evidence-classes",
+      "name": "Evidence-class ladder blocks weak evidence",
+      "evidenceClass": "unit",
+      "executor": "self.classes",
+      "required": true,
+      "claim": "Unit evidence can never satisfy external or desktop requirements."
+    },
+    {
+      "id": "harness.redaction",
+      "name": "Secrets are redacted before storage",
+      "evidenceClass": "unit",
+      "executor": "self.redaction",
+      "required": true
+    },
+    {
+      "id": "harness.sha256-index",
+      "name": "SHA-256 index verifies clean files and detects tampering",
+      "evidenceClass": "unit",
+      "executor": "self.hashes",
+      "required": true
+    },
+    {
+      "id": "harness.production-guard",
+      "name": "Production deny guard rejects production endpoints",
+      "evidenceClass": "unit",
+      "executor": "self.guard",
+      "required": true
+    },
+    {
+      "id": "harness.node-runtime",
+      "name": "Command receipt capture on the local runtime",
+      "evidenceClass": "integration",
+      "executor": "command.version",
+      "required": true,
+      "target": "localhost"
+    },
+    {
+      "id": "mail.transport.tcp",
+      "name": "Disposable mail target TCP reachability",
+      "evidenceClass": "integration",
+      "executor": "net.tcp-reachability",
+      "required": true,
+      "target": "127.0.0.1",
+      "params": { "port": 1025 },
+      "dependsOn": ["harness.node-runtime"],
+      "claim": "The local disposable delivery port accepts a TCP connection."
+    },
+    {
+      "id": "mail.protocol.smtp-banner",
+      "name": "Real SMTP banner and EHLO exchange",
+      "evidenceClass": "protocol",
+      "executor": "protocol.smtp-banner",
+      "required": true,
+      "target": "127.0.0.1",
+      "params": { "port": 1025 },
+      "dependsOn": ["mail.transport.tcp"],
+      "claim": "A real SMTP dialogue returns a 220 banner and 250 EHLO against the disposable engine."
+    },
+    {
+      "id": "mail.protocol.imap-capability",
+      "name": "Real IMAP greeting and CAPABILITY exchange",
+      "evidenceClass": "protocol",
+      "executor": "protocol.imap-capability",
+      "required": true,
+      "target": "127.0.0.1",
+      "params": { "port": 1143 },
+      "dependsOn": ["mail.transport.tcp"],
+      "claim": "A real IMAP dialogue returns an OK greeting and CAPABILITY against the disposable engine."
+    },
+    {
+      "id": "ui.browser.mail-web",
+      "name": "Browser E2E of the Mail surface",
+      "evidenceClass": "browser",
+      "executor": "browser.command",
+      "required": true,
+      "target": "http://localhost:5173",
+      "params": { "url": "http://localhost:5173", "browser": "chromium" },
+      "claim": "The Mail web surface renders and passes a scripted browser run."
+    },
+    {
+      "id": "desktop.windows-nsis",
+      "name": "Packaged Windows Desktop proof",
+      "evidenceClass": "desktop",
+      "executor": "desktop.package",
+      "required": true,
+      "params": { "artifactPath": "artifacts/navin-desktop-setup.exe", "packageType": "nsis" },
+      "claim": "The packaged NSIS Desktop artifact launches on Windows."
+    },
+    {
+      "id": "external.dns-records",
+      "name": "External DNS evidence for a disposable domain",
+      "evidenceClass": "external",
+      "executor": "external.dns",
+      "required": true,
+      "enabled": false,
+      "params": { "domain": "example.test", "types": ["MX", "TXT", "A"] },
+      "note": "Requires an explicitly allow-listed disposable domain; disabled until one exists.",
+      "claim": "Public MX/SPF/DKIM/DMARC records are published for an authorized disposable domain."
+    },
+    {
+      "id": "external.deliverability",
+      "name": "External deliverability probe",
+      "evidenceClass": "external",
+      "executor": "external.deliverability",
+      "required": true,
+      "enabled": false,
+      "params": { "domain": "example.test" },
+      "note": "Requires an authorized external probe; disabled until resources exist.",
+      "claim": "External inbox placement is verified with authorized disposable resources."
+    },
+    {
+      "id": "platform.navind-health",
+      "name": "navind health endpoint",
+      "evidenceClass": "integration",
+      "executor": "product.navind-health",
+      "required": true,
+      "target": "localhost",
+      "note": "Executor is not implemented yet. Must report BLOCKED, never PASS.",
+      "claim": "The navind daemon reports healthy from persisted state."
+    },
+    {
+      "id": "platform.evidence-restart",
+      "name": "Evidence survives daemon restart",
+      "evidenceClass": "backup_restore",
+      "executor": "product.evidence-restart",
+      "required": false,
+      "enabled": false,
+      "note": "Optional and disabled until the daemon exists; must report NOT_RUN.",
+      "claim": "Audit and evidence survive a navind restart."
+    }
+  ]
+}

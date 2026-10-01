@@ -1,0 +1,35 @@
+{
+  "name": "@navin/design-system",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./tokens": {
+      "types": "./dist/generated/tokens.d.ts",
+      "import": "./dist/generated/tokens.js"
+    },
+    "./tailwind-theme": {
+      "types": "./dist/generated/tailwind-theme.d.ts",
+      "import": "./dist/generated/tailwind-theme.js"
+    },
+    "./tokens.css": "./dist/generated/tokens.css"
+  },
+  "scripts": {
+    "generate": "tsx src/generator/cli.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "build": "tsc && node -e \"const fs = require('fs'); fs.mkdirSync('dist/generated', { recursive: true }); fs.copyFileSync('src/generated/tokens.css', 'dist/generated/tokens.css');\""
+  },
+  "devDependencies": {
+    "@types/node": "22.20.4",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

@@ -1,0 +1,7 @@
+# Runtime artifacts for the disposable acceptance environment.
+# Everything here is generated, contains generated credentials, and is never
+# committed. Evidence is produced under generated/evidence/ at run time.
+generated/
+*.log
+__pycache__/
+*.pyc

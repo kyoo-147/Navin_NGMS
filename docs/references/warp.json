@@ -1,0 +1,28 @@
+{
+  "id": "warp",
+  "name": "Warp Terminal",
+  "url": "https://github.com/warpdotdev/warp.git",
+  "pinned_commit": "7cef787ea0e14073c907e7628ddb8d1a720222b5",
+  "license": "AGPL-3.0-only AND MIT",
+  "license_files": [
+    "LICENSE-AGPL",
+    "LICENSE-MIT"
+  ],
+  "category": "reference-only",
+  "role": "Modern terminal UI, command execution block model, structured output rendering, and operator ergonomics reference",
+  "studied_paths": [
+    "crates/warp_terminal",
+    "crates/warp_cli",
+    "crates/warp_tui",
+    "crates/ui_components"
+  ],
+  "studied_behavior": "Block-based terminal output paradigms, command status indicators, stream splitting, and keyboard-first developer workflow interactions.",
+  "code_imported": false,
+  "attribution_required": true,
+  "caveats": [
+    "Contains AGPL-3.0 core code. Absolutely no code, shaders, or implementation logic may be imported into Navin.",
+    "Studied purely for CLI ergonomics and structured block UI concepts."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

@@ -1,0 +1,27 @@
+{
+  "id": "thunderbird-android",
+  "name": "Thunderbird Android (formerly K-9 Mail)",
+  "url": "https://github.com/thunderbird/thunderbird-android.git",
+  "pinned_commit": "df2d383dc1e8d6bd732af32ff69a8a45f34ca7b1",
+  "license": "Apache-2.0",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Mature sync state machines, durable outbox, IMAP protocol edge cases, and message lifecycle reference",
+  "studied_paths": [
+    "backend/imap",
+    "backend/jmap",
+    "mail/protocols/imap",
+    "mail/common"
+  ],
+  "studied_behavior": "IMAP IDLE reconnect loops, partial body fetch strategies, robust outbox spooling with exponential retry, mailbox folder reconciliation, and multi-account state management.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Android Kotlin codebase with extensive mobile-specific threading.",
+    "Studied for protocol edge cases, server quirks, and error recovery state machines. No code imported."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

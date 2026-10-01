@@ -1,0 +1,22 @@
+{
+  "id": "missing-field-fixture",
+  "name": "Missing Field Fixture",
+  "url": "https://github.com/example/missing-field.git",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Test fixture missing pinned_commit",
+  "studied_paths": [
+    "src"
+  ],
+  "studied_behavior": "Studied behavior.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Fixture missing pinned_commit."
+  ],
+  "reviewer": "Test Reviewer",
+  "verified_at": "2026-10-01T09:00:00+07:00"
+}

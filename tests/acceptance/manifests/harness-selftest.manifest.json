@@ -1,0 +1,49 @@
+{
+  "manifestVersion": 1,
+  "name": "w05-harness-selftest",
+  "description": "Proves the acceptance harness itself behaves truthfully: evidence-class ladder, redaction, SHA-256 index, production guard and command receipt capture.",
+  "allow": [],
+  "entries": [
+    {
+      "id": "harness.evidence-classes",
+      "name": "Evidence-class ladder blocks weak evidence",
+      "evidenceClass": "unit",
+      "executor": "self.classes",
+      "required": true,
+      "claim": "Unit evidence can never satisfy external or desktop requirements."
+    },
+    {
+      "id": "harness.redaction",
+      "name": "Secrets are redacted before storage",
+      "evidenceClass": "unit",
+      "executor": "self.redaction",
+      "required": true,
+      "claim": "Passwords, tokens, JWTs, private keys and URL credentials never reach receipts."
+    },
+    {
+      "id": "harness.sha256-index",
+      "name": "SHA-256 index verifies clean files and detects tampering",
+      "evidenceClass": "unit",
+      "executor": "self.hashes",
+      "required": true,
+      "claim": "Evidence artifacts are content-addressed and tamper-evident."
+    },
+    {
+      "id": "harness.production-guard",
+      "name": "Production deny guard rejects production endpoints",
+      "evidenceClass": "unit",
+      "executor": "self.guard",
+      "required": true,
+      "claim": "Production endpoints are always rejected; only local or reserved disposable targets pass."
+    },
+    {
+      "id": "harness.node-runtime",
+      "name": "Command receipt capture on the local runtime",
+      "evidenceClass": "integration",
+      "executor": "command.version",
+      "required": true,
+      "target": "localhost",
+      "claim": "A real local process is executed and captured as a redacted command receipt."
+    }
+  ]
+}

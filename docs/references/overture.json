@@ -1,0 +1,27 @@
+{
+  "id": "overture",
+  "name": "Fastmail Overture",
+  "url": "https://github.com/fastmail/overture.git",
+  "pinned_commit": "007aab21bee122e96126a5ebf7dbce745c326328",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Observable state, local mutations, undo/redo manager, query windows, and client sync architecture reference",
+  "studied_paths": [
+    "source/datastore",
+    "source/foundation",
+    "source/offline",
+    "source/storage"
+  ],
+  "studied_behavior": "Reactive datastore records, transaction batching, optimistic mutations with undo stack, windowed queries for large message sets, and offline change tracking.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Proprietary historical framework written in custom JS OOP classes; studied for datastore patterns and sync principles.",
+    "No code or class structures imported into Navin modern TypeScript stack."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

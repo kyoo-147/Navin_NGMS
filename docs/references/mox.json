@@ -1,0 +1,35 @@
+{
+  "id": "mox",
+  "name": "Mox Mail Server",
+  "url": "https://github.com/mjl-/mox.git",
+  "pinned_commit": "be2b665318823a932fcdc824b919c031d8215bab",
+  "license": "MIT AND MPL-2.0",
+  "license_files": [
+    "LICENSE.MIT",
+    "LICENSE.MPLv2.0"
+  ],
+  "category": "architecture-reference",
+  "role": "DNS, deliverability, ACME, SPF/DKIM/DMARC, and modern single-binary mail operational behavior reference",
+  "studied_paths": [
+    "dkim",
+    "dmarc",
+    "spf",
+    "autotls",
+    "dns",
+    "smtp",
+    "smtpserver",
+    "imapserver",
+    "queue",
+    "webadmin"
+  ],
+  "studied_behavior": "Integrated deliverability verification, automated DNS configuration generation, ACME TLS certificate lifecycle, DMARC evaluation and reporting, and mail queue ergonomics.",
+  "code_imported": false,
+  "attribution_required": true,
+  "caveats": [
+    "Contains both MIT and MPL-2.0 components. Studied strictly as an operational and protocol design reference.",
+    "No Go source code imported into Navin.",
+    "Primary candidate for permissive mail engine spike."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

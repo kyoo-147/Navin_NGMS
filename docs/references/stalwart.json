@@ -1,0 +1,32 @@
+{
+  "id": "stalwart",
+  "name": "Stalwart Mail Server",
+  "url": "https://github.com/stalwartlabs/stalwart.git",
+  "pinned_commit": "648df2d6f1fa7e1a5ccf005949273179386fe037",
+  "license": "AGPL-3.0-only OR LicenseRef-SEL",
+  "license_files": [
+    "LICENSES/AGPL-3.0-only.txt",
+    "LICENSES/LicenseRef-SEL.txt"
+  ],
+  "category": "external-engine",
+  "role": "External engine behind adapter; JMAP/admin behavior and engine capabilities reference",
+  "studied_paths": [
+    "crates/jmap",
+    "crates/jmap-proto",
+    "crates/directory",
+    "crates/smtp",
+    "crates/imap",
+    "crates/store",
+    "resources/config"
+  ],
+  "studied_behavior": "RFC 8620 / RFC 8621 JMAP method semantics, blob upload/download mechanisms, admin REST API structure, directory sync, and storage backend abstraction.",
+  "code_imported": false,
+  "attribution_required": true,
+  "caveats": [
+    "Dual-licensed under AGPL-3.0-only and Stalwart Enterprise License v2 (SELv2). Strictly no code or derivation may be imported into Navin.",
+    "Used solely as an external engine container via the engine-stalwart adapter.",
+    "Navin core packages must not depend on Stalwart-specific types or data structures."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

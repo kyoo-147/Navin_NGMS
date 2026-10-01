@@ -1,0 +1,28 @@
+{
+  "id": "mailu",
+  "name": "Mailu",
+  "url": "https://github.com/mailu/mailu.git",
+  "pinned_commit": "e417c9013463ab808706044606e286cb39b785b7",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE.md"
+  ],
+  "category": "architecture-reference",
+  "role": "Container orchestration, mail stack assembly, administration, and web setup reference",
+  "studied_paths": [
+    "core/admin",
+    "core/dovecot",
+    "core/postfix",
+    "core/rspamd",
+    "setup"
+  ],
+  "studied_behavior": "Multi-container mail orchestration patterns, configuration generation for Postfix/Dovecot/Rspamd, admin web wizard flows, and TLS management.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Python/Flask/Docker Compose multi-service architecture; Navin uses a unified navind daemon with SQLite.",
+    "Studied for operational setup flows, DNS record guidance, and administration endpoints. No code imported."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

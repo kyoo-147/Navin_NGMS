@@ -1,0 +1,3 @@
+# Preserve LF line endings on every platform so generated evidence bundles keep
+# their exact bytes and the committed SHA-256 indexes verify after a fresh clone.
+* text=auto eol=lf

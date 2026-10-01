@@ -1,0 +1,27 @@
+{
+  "id": "proton-webclients",
+  "name": "Proton Mail WebClients",
+  "url": "https://github.com/ProtonMail/WebClients.git",
+  "pinned_commit": "4ceca26f3fe59fbf8bcb1b97fe76b298b7c6a586",
+  "license": "GPL-3.0-only",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Mail rendering defenses, phishing protection, remote content isolation, and HTML sanitization security reference",
+  "studied_paths": [
+    "applications/mail",
+    "packages/mail-renderer",
+    "packages/sanitize",
+    "packages/encrypted-search"
+  ],
+  "studied_behavior": "HTML email sanitization pipeline, remote pixel tracking blocking, external link warning interstitials, iframe sandboxing, and secure SVG handling.",
+  "code_imported": false,
+  "attribution_required": true,
+  "caveats": [
+    "Strict copyleft license (GPL-3.0-only). Under no circumstances may any code, functions, or styling from Proton be copied or imported into Navin.",
+    "Used strictly as a mental security checklist for email sanitization attack vectors and privacy boundaries."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

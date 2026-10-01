@@ -1,0 +1,69 @@
+{
+  "$schema": "./schema.json",
+  "version": "1.0.0",
+  "policy_name": "Navin Provenance and Dependency License Policy",
+  "description": "Governs acceptable licenses for declared runtime/build dependencies, strictly bans copying/importing code from external applications or copyleft sources, and defines structured provenance requirements for reference checkouts.",
+  "dependency_allowlist": {
+    "permissive": [
+      "MIT",
+      "Apache-2.0",
+      "BSD-2-Clause",
+      "BSD-3-Clause",
+      "ISC"
+    ],
+    "review_required": [
+      "MPL-2.0",
+      "LGPL-3.0-only",
+      "LGPL-2.1-only",
+      "CDDL-1.0"
+    ],
+    "prohibited": [
+      "AGPL-3.0-only",
+      "AGPL-3.0-or-later",
+      "GPL-2.0-only",
+      "GPL-2.0-or-later",
+      "GPL-3.0-only",
+      "GPL-3.0-or-later",
+      "SSPL-1.0",
+      "BUSL-1.1",
+      "UNLICENSED",
+      "UNKNOWN"
+    ]
+  },
+  "app_source_import_policy": {
+    "allow_external_app_source_import": false,
+    "deny_unknown_or_unlicensed": true,
+    "deny_copyleft_derivation": true,
+    "enforce_code_imported_false": true
+  },
+  "provenance_requirements": {
+    "distinguish_reference_from_dependency": true,
+    "allowed_reference_categories": [
+      "reference-only",
+      "architecture-reference",
+      "standards-reference",
+      "dependency-candidate",
+      "external-engine"
+    ],
+    "required_record_fields": [
+      "id",
+      "name",
+      "url",
+      "pinned_commit",
+      "license",
+      "license_files",
+      "category",
+      "role",
+      "studied_paths",
+      "studied_behavior",
+      "code_imported",
+      "attribution_required",
+      "caveats",
+      "reviewer",
+      "verified_at"
+    ],
+    "require_40_hex_commit": true,
+    "require_valid_url": true,
+    "code_imported_must_be_false": true
+  }
+}

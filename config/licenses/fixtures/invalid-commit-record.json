@@ -1,0 +1,23 @@
+{
+  "id": "invalid-commit-fixture",
+  "name": "Invalid Commit Fixture",
+  "url": "https://github.com/example/invalid-commit.git",
+  "pinned_commit": "not-a-valid-40-hex-sha",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Test fixture with invalid commit",
+  "studied_paths": [
+    "src"
+  ],
+  "studied_behavior": "Studied behavior.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Fixture with invalid commit."
+  ],
+  "reviewer": "Test Reviewer",
+  "verified_at": "2026-10-01T09:00:00+07:00"
+}

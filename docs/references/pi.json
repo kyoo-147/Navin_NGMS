@@ -1,0 +1,28 @@
+{
+  "id": "pi",
+  "name": "Pi Coding Assistant",
+  "url": "https://github.com/earendil-works/pi.git",
+  "pinned_commit": "a0660b174eceded86ab93d31320249e6dc994ef8",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "architecture-reference",
+  "role": "Extension registration, agent lifecycle ergonomics, tool execution, and session protocol architecture reference",
+  "studied_paths": [
+    "packages/agent",
+    "packages/client",
+    "packages/protocol",
+    "packages/server",
+    "packages/coding-agent"
+  ],
+  "studied_behavior": "Modular extension interfaces, structured tool execution schemas, agent session protocol messages, and event streaming.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Permissively licensed under MIT.",
+    "Studied for extension lifecycle and agent protocol interfaces. Navin authors its own navind extension registry. No code imported."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

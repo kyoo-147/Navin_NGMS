@@ -1,0 +1,28 @@
+{
+  "id": "root-fr",
+  "name": "root-fr jmap-webmail",
+  "url": "https://github.com/root-fr/jmap-webmail.git",
+  "pinned_commit": "fc7b22a74a50877c984b5e3427fe086a434d0ad0",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "JMAP webmail client architecture, React/Next.js store integration, and JMAP API consumption patterns",
+  "studied_paths": [
+    "app",
+    "components",
+    "lib",
+    "stores",
+    "hooks"
+  ],
+  "studied_behavior": "Direct JMAP API session discovery, message list rendering with pagination, mailbox hierarchy navigation, and draft compose flow.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Studied for JMAP frontend request lifecycle and React state management.",
+    "Navin connects through navind session-aware BFF rather than browser-direct JMAP sessions. No code imported."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

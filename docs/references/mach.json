@@ -1,0 +1,28 @@
+{
+  "id": "mach",
+  "name": "Mach Desktop Email Client",
+  "url": "https://github.com/bborn/mach.git",
+  "pinned_commit": "b5b07c46acc66ce6ad9bca07b28a624d650da01e",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Local-first SQLite/FTS5, Tauri command boundaries, keyboard navigation, and Gmail shortcut mental model reference",
+  "studied_paths": [
+    "src-tauri/src/main.rs",
+    "src-tauri/src/lib.rs",
+    "src-tauri/src/config.rs",
+    "src-tauri/src/frame_keyboard.rs",
+    "plugins"
+  ],
+  "studied_behavior": "Tauri 2 IPC command design, local SQLite storage patterns, keyboard shortcut interceptors for Gmail compatibility, and window frame ergonomics.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Studied for desktop client integration patterns and Tauri IPC boundaries.",
+    "Navin implements its own custom React design system and navind daemon communication. No code imported."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

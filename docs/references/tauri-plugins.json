@@ -1,0 +1,31 @@
+{
+  "id": "tauri-plugins",
+  "name": "Tauri Plugins Workspace",
+  "url": "https://github.com/tauri-apps/plugins-workspace.git",
+  "pinned_commit": "d4835d0e947179bac24a383212792d74be3ebe4f",
+  "license": "MIT OR Apache-2.0",
+  "license_files": [
+    "LICENSE_MIT",
+    "LICENSE_APACHE-2.0"
+  ],
+  "category": "dependency-candidate",
+  "role": "Official desktop shell capabilities: deep linking, updater, OS notification, persistent store, and capability ACL reference",
+  "studied_paths": [
+    "plugins/deep-link",
+    "plugins/notification",
+    "plugins/store",
+    "plugins/updater",
+    "plugins/stronghold",
+    "plugins/process",
+    "plugins/dialog"
+  ],
+  "studied_behavior": "Tauri 2 plugin architecture, capability permissions JSON definitions, cross-platform notification dispatch, and deep-link protocol registration.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Permissively licensed dual MIT/Apache-2.0.",
+    "Plugins can be declared as external npm/cargo dependencies when building apps/desktop. No internal repository source copied."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

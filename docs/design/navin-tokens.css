@@ -1,0 +1,87 @@
+:root {
+  --bg-app: #FAFAF8;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F6F6F3;
+  --bg-hover: #F2F2EE;
+  --bg-active: #ECEDE8;
+
+  --text-primary: #171816;
+  --text-secondary: #60635D;
+  --text-tertiary: #8A8D86;
+  --text-disabled: #B5B7B1;
+
+  --border-default: #E4E5E0;
+  --border-strong: #D3D5CF;
+  --divider: #ECEDE9;
+
+  --accent: #7BCB45;
+  --accent-hover: #6DBC39;
+  --accent-active: #5EA92F;
+  --accent-soft: #EEF8E8;
+  --accent-text: #32691A;
+  --accent-vivid: #9CEC25;
+
+  --success: #2F7D32;
+  --success-soft: #EDF7EE;
+  --warning: #A66A00;
+  --warning-soft: #FFF6E5;
+  --danger: #C83E3A;
+  --danger-soft: #FFF0EF;
+  --info: #456B8C;
+  --info-soft: #EFF5FA;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+
+  --shadow-popover: 0 6px 24px rgba(0,0,0,.08);
+  --shadow-modal: 0 16px 48px rgba(0,0,0,.12);
+
+  --sidebar-width: 224px;
+  --sidebar-collapsed: 56px;
+  --header-height: 52px;
+  --content-max: 1440px;
+  --page-padding: 24px;
+
+  --mail-sidebar: 224px;
+  --mail-row: 40px;
+  --mail-toolbar: 48px;
+  --mail-ai-drawer: 320px;
+
+  --control-sidebar: 216px;
+  --control-header: 52px;
+  --control-content-max: 1120px;
+
+  --motion-fast: 120ms;
+  --motion-default: 180ms;
+  --motion-slow: 240ms;
+  --motion-ease: cubic-bezier(.2,.8,.2,1);
+}
+
+[data-theme="dark"] {
+  --bg-app: #111210;
+  --bg-surface: #171816;
+  --bg-subtle: #1D1F1C;
+  --bg-hover: #252723;
+  --bg-active: #2D302A;
+  --text-primary: #F2F3EF;
+  --text-secondary: #AEB2A8;
+  --text-tertiary: #80847C;
+  --border-default: #2B2E29;
+  --border-strong: #3A3D36;
+  --accent: #8ED95A;
+  --accent-soft: #20331A;
+}

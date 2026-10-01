@@ -1,0 +1,26 @@
+{
+  "id": "zero",
+  "name": "Mail-0 (Zero)",
+  "url": "https://github.com/Mail-0/Zero.git",
+  "pinned_commit": "64c5480c341750578da0746f2db9ad84da686334",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Modern compose, thread view, keyboard shortcut handling, and AI email interaction behavior reference",
+  "studied_paths": [
+    "apps/mail",
+    "apps/server",
+    "packages/cli"
+  ],
+  "studied_behavior": "Thread view layout hierarchy, rich text compose editor integration, prompt-assisted drafting, and local optimistic message state updates.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Narrow reference for UI ergonomics and AI interaction design.",
+    "Navin uses its own strict design system tokens and modular navind daemon. No code imported."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

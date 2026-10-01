@@ -1,0 +1,32 @@
+.env
+credentials.env
+backups/
+data/
+state/
+.pi/
+*.log
+*.tar.zst
+.playwright-cli/
+.commandcode/
+.lavish/
+.private/
+
+# Deployment-specific values and generated acceptance artifacts must stay local.
+config/local/
+tests/acceptance/evidence/
+*.pem
+*.key
+*.p12
+*.pfx
+*.sqlite
+*.sqlite3
+*.db
+
+# Node / TypeScript workspace
+node_modules/
+dist/
+build/
+coverage/
+.output/
+.vite/
+*.tsbuildinfo

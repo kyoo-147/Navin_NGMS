@@ -1,0 +1,23 @@
+{
+  "id": "code-imported-true-fixture",
+  "name": "Code Imported True Fixture",
+  "url": "https://github.com/example/imported.git",
+  "pinned_commit": "0123456789abcdef0123456789abcdef01234567",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Test fixture with code_imported true",
+  "studied_paths": [
+    "src"
+  ],
+  "studied_behavior": "Studied behavior.",
+  "code_imported": true,
+  "attribution_required": false,
+  "caveats": [
+    "Fixture violating code_imported policy."
+  ],
+  "reviewer": "Test Reviewer",
+  "verified_at": "2026-10-01T09:00:00+07:00"
+}

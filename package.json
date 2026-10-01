@@ -1,0 +1,44 @@
+{
+  "name": "navin",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.33.2",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "scripts": {
+    "build": "pnpm -r --if-present run build && pnpm run build:root",
+    "build:root": "tsc --build",
+    "clean": "pnpm -r --if-present run clean && pnpm run clean:root",
+    "clean:root": "tsc --build --clean",
+    "typecheck": "pnpm -r --if-present run typecheck && pnpm run typecheck:root",
+    "typecheck:root": "tsc --build",
+    "lint": "pnpm -r --if-present run lint && pnpm run lint:root",
+    "lint:root": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "provenance:check": "node scripts/check-licenses.mjs --no-verify-local",
+    "provenance:test": "node --test scripts/check-licenses.test.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "pnpm -r --if-present run test && pnpm run test:root",
+    "test:root": "vitest run",
+    "test:watch": "vitest"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@types/node": "22.20.4",
+    "eslint": "9.39.5",
+    "globals": "16.5.0",
+    "prettier": "3.9.9",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.71.0",
+    "vitest": "3.2.7"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

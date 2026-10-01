@@ -1,0 +1,27 @@
+{
+  "id": "stormbox",
+  "name": "Thunderbird Stormbox",
+  "url": "https://github.com/thunderbird/stormbox.git",
+  "pinned_commit": "ccac91b57626bc749a88fbd7e10181c5a7da4b84",
+  "license": "MPL-2.0",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Experimental webmail client, local cache sync, and Rust backend synchronization reference",
+  "studied_paths": [
+    "src/sync",
+    "src/db",
+    "src/services",
+    "src/stores"
+  ],
+  "studied_behavior": "Message synchronization state machines, local database caching strategies, offline mutation queueing, and reactive store architecture.",
+  "code_imported": false,
+  "attribution_required": true,
+  "caveats": [
+    "Licensed under Mozilla Public License 2.0 (MPL-2.0).",
+    "Experimental prototype; inspected for synchronization patterns only. Zero code imported into Navin."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

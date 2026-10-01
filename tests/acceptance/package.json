@@ -1,0 +1,20 @@
+{
+  "name": "@navin/acceptance-harness",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "W05 cross-platform acceptance harness: run manifest, evidence classes, receipts, SHA-256 index, redaction and production deny guard.",
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "navin-acceptance": "bin/navin-acceptance.mjs"
+  },
+  "scripts": {
+    "test": "node --test \"test/**/*.test.mjs\"",
+    "selftest": "node --test \"test/**/*.test.mjs\"",
+    "validate": "node bin/navin-acceptance.mjs validate --manifest manifests/phase1.manifest.json",
+    "run:selftest": "node bin/navin-acceptance.mjs run --manifest manifests/harness-selftest.manifest.json --out out",
+    "run:phase1": "node bin/navin-acceptance.mjs run --manifest manifests/phase1.manifest.json --out out"
+  }
+}

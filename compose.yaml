@@ -1,0 +1,65 @@
+name: navin-mail
+
+services:
+  stalwart:
+    image: ${STALWART_IMAGE:-stalwartlabs/stalwart:v0.16.24}
+    container_name: navin-mail-stalwart
+    restart: unless-stopped
+    environment:
+      STALWART_PUBLIC_URL: https://${MAIL_HOSTNAME}
+      TZ: ${TIMEZONE:-UTC}
+    ports:
+      - "25:25"
+      - "465:465"
+      - "587:587"
+      - "993:993"
+      - "${STALWART_HTTP_BIND:-127.0.0.1:8082}:8080"
+    volumes:
+      - ./data/stalwart/etc:/etc/stalwart
+      - ./data/stalwart/lib:/var/lib/stalwart
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      mail:
+        aliases:
+          - ${MAIL_HOSTNAME}
+
+  snappymail:
+    image: ${SNAPPYMAIL_IMAGE:-djmaze/snappymail:v2.38.2}
+    container_name: navin-mail-snappymail
+    restart: unless-stopped
+    depends_on:
+      - stalwart
+    environment:
+      TZ: ${TIMEZONE:-UTC}
+      UPLOAD_MAX_SIZE: 25M
+      MEMORY_LIMIT: 128M
+      SECURE_COOKIES: "true"
+    ports:
+      - "${SNAPPYMAIL_HTTP_BIND:-127.0.0.1:8888}:8888"
+    volumes:
+      - ./data/snappymail:/var/lib/snappymail
+    security_opt:
+      - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -T 3 --header='X-Forwarded-Proto: https' -O /dev/null http://127.0.0.1:8888/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+    networks:
+      - mail
+
+networks:
+  mail:
+    name: navin-mail

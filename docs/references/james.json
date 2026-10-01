@@ -1,0 +1,28 @@
+{
+  "id": "james",
+  "name": "Apache James",
+  "url": "https://github.com/apache/james-project.git",
+  "pinned_commit": "9aac85900f94cb56db9f0b24c91b7c983cb49332",
+  "license": "Apache-2.0",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "architecture-reference",
+  "role": "JMAP/admin boundaries and mail-processing mailet pipeline architecture reference",
+  "studied_paths": [
+    "server/protocols/jmap-rfc-8621",
+    "server/mailet",
+    "server/mailrepository",
+    "server/queue",
+    "server/dns-service"
+  ],
+  "studied_behavior": "Modular mail processing pipeline architecture, mailet matchers and processors, JMAP RFC-8621 mailbox/message handling, and spool management.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Heavyweight JVM runtime; evaluated purely for architectural patterns, not direct deployment.",
+    "No Java or Scala source code imported into Navin TypeScript/Rust stack."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

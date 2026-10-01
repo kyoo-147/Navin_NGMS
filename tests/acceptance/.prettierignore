@@ -1,0 +1,4 @@
+# Evidence bundles are content-addressed by SHA-256 and must stay byte-exact.
+# Formatting them would change bytes and invalidate index.sha256.
+evidence/
+out/

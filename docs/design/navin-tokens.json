@@ -1,0 +1,80 @@
+{
+  "color": {
+    "light": {
+      "bgApp": "#FAFAF8",
+      "bgSurface": "#FFFFFF",
+      "bgSubtle": "#F6F6F3",
+      "bgHover": "#F2F2EE",
+      "bgActive": "#ECEDE8",
+      "textPrimary": "#171816",
+      "textSecondary": "#60635D",
+      "textTertiary": "#8A8D86",
+      "borderDefault": "#E4E5E0",
+      "borderStrong": "#D3D5CF",
+      "divider": "#ECEDE9",
+      "accent": "#7BCB45",
+      "accentHover": "#6DBC39",
+      "accentActive": "#5EA92F",
+      "accentSoft": "#EEF8E8",
+      "accentText": "#32691A",
+      "accentVivid": "#9CEC25",
+      "success": "#2F7D32",
+      "warning": "#A66A00",
+      "danger": "#C83E3A",
+      "info": "#456B8C"
+    },
+    "dark": {
+      "bgApp": "#111210",
+      "bgSurface": "#171816",
+      "bgSubtle": "#1D1F1C",
+      "bgHover": "#252723",
+      "bgActive": "#2D302A",
+      "textPrimary": "#F2F3EF",
+      "textSecondary": "#AEB2A8",
+      "textTertiary": "#80847C",
+      "borderDefault": "#2B2E29",
+      "borderStrong": "#3A3D36",
+      "accent": "#8ED95A",
+      "accentSoft": "#20331A"
+    }
+  },
+  "spacing": {
+    "1": 4,
+    "2": 8,
+    "3": 12,
+    "4": 16,
+    "5": 20,
+    "6": 24,
+    "8": 32,
+    "10": 40,
+    "12": 48,
+    "16": 64
+  },
+  "radius": {
+    "xs": 4,
+    "sm": 6,
+    "md": 8,
+    "lg": 10,
+    "xl": 12
+  },
+  "layout": {
+    "sidebarWidth": 224,
+    "sidebarCollapsed": 56,
+    "headerHeight": 52,
+    "contentMax": 1440,
+    "pagePadding": 24,
+    "mailSidebar": 224,
+    "mailRow": 40,
+    "mailToolbar": 48,
+    "mailAiDrawer": 320,
+    "controlSidebar": 216,
+    "controlHeader": 52,
+    "controlContentMax": 1120
+  },
+  "motion": {
+    "fast": 120,
+    "default": 180,
+    "slow": 240,
+    "easing": "cubic-bezier(.2,.8,.2,1)"
+  }
+}

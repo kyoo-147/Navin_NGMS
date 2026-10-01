@@ -1,0 +1,19 @@
+node_modules/
+dist/
+build/
+coverage/
+.output/
+pnpm-lock.yaml
+
+# Existing Bash mail platform, not part of the TypeScript workspace
+.env.example
+README.md
+compose.yaml
+navin-mail
+config/
+docs/
+scripts/
+.commandcode/
+
+# W05 acceptance evidence bundles are byte-exact and SHA-256 verified
+tests/acceptance/evidence/

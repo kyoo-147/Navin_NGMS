@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+COMMAND="${1:-help}"
+shift || true
+
+case "$COMMAND" in
+  install|bootstrap|status|doctor|dns|backup|restore|update|user|nginx|configure-server|configure-snappymail|sync-certificate|install-backup-timer)
+    exec "$ROOT_DIR/scripts/$COMMAND.sh" "$@"
+    ;;
+  logs)
+    cd "$ROOT_DIR"
+    exec docker compose logs --tail=200 -f "${1:-}"
+    ;;
+  help|-h|--help)
+    cat <<'USAGE'
+Navin Mail operations
+
+Usage: ./navin-mail <command> [arguments]
+
+  install              Validate host and start pinned services
+  bootstrap            Complete one-time Stalwart setup
+  status               Show container, resource and listener status
+  doctor               Run local, DNS and TLS diagnostics
+  dns                  Print required DNS records and current observations
+  nginx [check|apply]  Render/check or install Nginx virtual hosts
+  configure-server     Reconcile Stalwart submission listener
+  configure-snappymail Configure and harden company webmail
+  sync-certificate     Import the current Let's Encrypt cert into Stalwart
+  user ...             Manage Stalwart users through stalwart-cli
+  backup               Create a consistent local backup
+  install-backup-timer Enable a daily local backup systemd timer
+  restore <archive>    Restore a backup after explicit confirmation
+  update               Backup, pull pinned images, restart, verify
+  logs [service]       Follow service logs
+USAGE
+    ;;
+  *)
+    echo "Unknown command: $COMMAND" >&2
+    exec "$0" help
+    ;;
+esac

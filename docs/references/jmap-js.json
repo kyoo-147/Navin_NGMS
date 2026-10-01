@@ -1,0 +1,29 @@
+{
+  "id": "jmap-js",
+  "name": "JMAP JS",
+  "url": "https://github.com/jmapio/jmap-js.git",
+  "pinned_commit": "43627b4d5e5bb934e3fabed2c2f6d7cbef9dd704",
+  "license": "MIT",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "standards-reference",
+  "role": "IETF JMAP client protocol reference, method calling conventions, change tracking, and data models",
+  "studied_paths": [
+    "source/api/Connection.js",
+    "source/api/Auth.js",
+    "source/mail/mail-model.js",
+    "source/mail/Mailbox.js",
+    "source/mail/Message.js",
+    "source/mail/Thread.js"
+  ],
+  "studied_behavior": "JMAP session bootstrap, batch invocation of JMAP method calls (Email/get, Mailbox/get, Email/changes), backoff handling, and standard data types.",
+  "code_imported": false,
+  "attribution_required": false,
+  "caveats": [
+    "Canonical reference implementation by Fastmail / JMAP working group.",
+    "Used to verify RFC compliance and request/response shapes. Navin writes native TypeScript models. No code imported."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}

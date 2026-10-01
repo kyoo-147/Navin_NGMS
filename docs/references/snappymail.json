@@ -1,0 +1,27 @@
+{
+  "id": "snappymail",
+  "name": "SnappyMail Webmail",
+  "url": "https://github.com/the-djmaze/snappymail.git",
+  "pinned_commit": "c154d23cfeca1137647b0cf88dd492e3e29e164e",
+  "license": "AGPL-3.0-only",
+  "license_files": [
+    "LICENSE"
+  ],
+  "category": "reference-only",
+  "role": "Legacy webmail container configuration, IMAP webmail operational baseline, and migration reference",
+  "studied_paths": [
+    "snappymail/v/0.0.0/app",
+    "snappymail/v/0.0.0/static",
+    "snappymail/v/0.0.0/themes"
+  ],
+  "studied_behavior": "Configuration script parameters, PHP IMAP webmail container runtime, and legacy webmail setup hooks.",
+  "code_imported": false,
+  "attribution_required": true,
+  "caveats": [
+    "Strictly copyleft (AGPL-3.0-only).",
+    "Used temporarily in docker compose during development transition via scripts/configure-snappymail.sh.",
+    "Strictly zero code imported into Navin application or webmail code."
+  ],
+  "reviewer": "Navin Maintainer",
+  "verified_at": "2026-10-01T09:28:00+07:00"
+}
