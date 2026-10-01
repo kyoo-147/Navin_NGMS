@@ -1,0 +1,33 @@
+{
+  "name": "@navin/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Navin thin Tauri 2 desktop shell: lazy Mail and permission-gated Control modules over narrowly allowlisted native bridges.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:rust": "cargo test -p navin-desktop-core --manifest-path src-tauri/Cargo.toml"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.12.1",
+    "@tauri-apps/plugin-deep-link": "2.6.1",
+    "@tauri-apps/plugin-dialog": "2.8.1",
+    "@tauri-apps/plugin-notification": "2.5.1",
+    "@tauri-apps/plugin-updater": "2.13.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "2.12.1",
+    "@types/node": "22.20.4",
+    "typescript": "5.9.3",
+    "vite": "7.3.6",
+    "vitest": "3.2.7"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Narrow allowlist for the single Navin shell window: only the plugin bridges the shell actually uses. No shell, fs, http, process or broad core permissions are granted.",
+  "windows": ["main"],
+  "permissions": [
+    "core:event:allow-listen",
+    "core:event:allow-unlisten",
+    "core:event:allow-emit",
+    "core:event:allow-emit-to",
+    "deep-link:allow-get-current",
+    "deep-link:allow-register",
+    "deep-link:allow-unregister",
+    "dialog:allow-open",
+    "dialog:allow-save",
+    "notification:allow-is-permission-granted",
+    "notification:allow-request-permission",
+    "notification:allow-notify",
+    "updater:allow-check"
+  ]
+}

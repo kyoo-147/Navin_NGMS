@@ -1,0 +1,35 @@
+[workspace]
+members = ["crates/navin-desktop-core"]
+resolver = "2"
+
+[package]
+name = "navin-desktop"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.90"
+description = "Navin thin Tauri 2 desktop shell (native bridges only, no business logic)"
+license = "Apache-2.0"
+publish = false
+
+[lib]
+name = "navin_desktop"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+navin-desktop-core = { path = "crates/navin-desktop-core" }
+tauri = { version = "2", features = ["tray-icon", "image-png"] }
+tauri-plugin-deep-link = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-notification = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-updater = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+keyring = { version = "3", features = [
+  "apple-native",
+  "windows-native",
+  "linux-native-sync-persistent",
+] }

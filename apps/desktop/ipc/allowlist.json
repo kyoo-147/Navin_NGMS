@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "description": "Canonical narrow allowlist for Navin Desktop custom IPC commands. Shared by the TypeScript renderer (apps/desktop/src/shell/ipc/allowlist.ts) and the Rust core (navin-desktop-core::ipc). Unknown commands are denied by default on both sides.",
+  "commands": [
+    "navin_shell_info",
+    "navin_navind_validate_endpoint",
+    "navin_secret_store",
+    "navin_secret_retrieve",
+    "navin_secret_delete"
+  ]
+}
