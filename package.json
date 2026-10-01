@@ -13,7 +13,7 @@
     "build:root": "tsc --build",
     "clean": "pnpm -r --if-present run clean && pnpm run clean:root",
     "clean:root": "tsc --build --clean",
-    "typecheck": "pnpm -r --if-present run typecheck && pnpm run typecheck:root",
+    "typecheck": "pnpm -r --if-present run build && pnpm -r --if-present run typecheck && pnpm run typecheck:root",
     "typecheck:root": "tsc --build",
     "lint": "pnpm -r --if-present run lint && pnpm run lint:root",
     "lint:root": "eslint .",

@@ -133,7 +133,10 @@ export function SetupApp({ client, initialSessionId }: SetupAppProps): React.JSX
   // 1. Loading State
   if (isLoading) {
     return (
-      <div className="setup-loading-state" style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto' }}>
+      <div
+        className="setup-loading-state"
+        style={{ padding: '24px', maxWidth: '1000px', margin: '0 auto' }}
+      >
         <h1 style={{ fontSize: '1.5rem', marginBottom: '16px' }}>Navin Control Setup</h1>
         <Skeleton variant="rect" height={40} style={{ marginBottom: '16px' }} />
         <Skeleton variant="rect" height={180} style={{ marginBottom: '16px' }} />
@@ -145,7 +148,10 @@ export function SetupApp({ client, initialSessionId }: SetupAppProps): React.JSX
   // 2. Error State
   if (errorMessage && !session) {
     return (
-      <div className="setup-error-state" style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}>
+      <div
+        className="setup-error-state"
+        style={{ padding: '24px', maxWidth: '800px', margin: '0 auto' }}
+      >
         <ErrorState
           title="Setup Connection Error"
           description={errorMessage}
@@ -162,12 +168,18 @@ export function SetupApp({ client, initialSessionId }: SetupAppProps): React.JSX
   // 3. Empty State
   if (!session) {
     return (
-      <div className="setup-empty-state" style={{ padding: '24px', maxWidth: '600px', margin: '0 auto' }}>
+      <div
+        className="setup-empty-state"
+        style={{ padding: '24px', maxWidth: '600px', margin: '0 auto' }}
+      >
         <EmptyState
           title="No Setup Session Active"
           description="Begin a new setup journey to discover, configure, approve, and verify this Navin node."
         />
-        <form onSubmit={handleCreateSession} style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <form
+          onSubmit={handleCreateSession}
+          style={{ marginTop: '20px', display: 'flex', flexDirection: 'column', gap: '12px' }}
+        >
           <Input
             label="Setup Session Title"
             value={newTitle}
@@ -189,24 +201,33 @@ export function SetupApp({ client, initialSessionId }: SetupAppProps): React.JSX
   }
 
   // Active Session View
-  const completedStages = session.blocks
-    .filter((b) => b.status === 'passed')
-    .map((b) => b.stage)
+  const completedStages = session.blocks.filter((b) => b.status === 'passed').map((b) => b.stage)
 
   // Find active block: first non-passed block, or last block if completed
   const activeBlock: SetupBlock =
     session.blocks.find((b) => b.status !== 'passed') || session.blocks[session.blocks.length - 1]!
 
   const sessionStatusTone: StatusTone =
-    session.status === 'completed'
-      ? 'success'
-      : session.status === 'failed'
-        ? 'danger'
-        : 'info'
+    session.status === 'completed' ? 'success' : session.status === 'failed' ? 'danger' : 'info'
 
   return (
-    <main className="setup-app-shell" style={{ padding: '24px', maxWidth: '1100px', margin: '0 auto', fontFamily: 'system-ui, sans-serif' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
+    <main
+      className="setup-app-shell"
+      style={{
+        padding: '24px',
+        maxWidth: '1100px',
+        margin: '0 auto',
+        fontFamily: 'system-ui, sans-serif',
+      }}
+    >
+      <header
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'flex-start',
+          marginBottom: '16px',
+        }}
+      >
         <div>
           <h1 style={{ margin: '0 0 6px 0', fontSize: '1.6rem' }}>{session.title}</h1>
           <div style={{ color: '#666', fontSize: '0.85rem', fontFamily: 'monospace' }}>
@@ -217,9 +238,7 @@ export function SetupApp({ client, initialSessionId }: SetupAppProps): React.JSX
           <Button variant="secondary" onClick={handleResume} disabled={isActionRunning}>
             Resume Setup
           </Button>
-          <StatusBadge tone={sessionStatusTone}>
-            {session.status}
-          </StatusBadge>
+          <StatusBadge tone={sessionStatusTone}>{session.status}</StatusBadge>
         </div>
       </header>
 
@@ -242,7 +261,9 @@ export function SetupApp({ client, initialSessionId }: SetupAppProps): React.JSX
       <StageNavigation currentStage={session.currentStage} completedStages={completedStages} />
 
       {/* Main Grid: Active Block View + Evidence Panel */}
-      <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginTop: '20px' }}>
+      <div
+        style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginTop: '20px' }}
+      >
         <ActiveBlockView
           session={session}
           block={activeBlock}

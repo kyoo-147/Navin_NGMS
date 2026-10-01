@@ -1,9 +1,11 @@
 import { generateUUID } from '../utils/uuid.js'
 import type {
+  MessageId,
   MailMutationRequest,
   MailMutationResponse,
   MailQueryRequest,
   MailSubmissionResponse,
+  ThreadId,
 } from '@navin/contracts'
 import type {
   MailGateway,
@@ -155,11 +157,11 @@ export class MailClient {
     return { threads, total: threads.length }
   }
 
-  async getThread(accountId: string, threadId: string): Promise<NormalizedEmail[]> {
+  async getThread(accountId: string, threadId: ThreadId): Promise<NormalizedEmail[]> {
     if (this.online) {
       try {
         const ctx = this.ctxFactory(accountId)
-        const remoteThread = await this.gateway.getThread(ctx, accountId, threadId as any)
+        const remoteThread = await this.gateway.getThread(ctx, accountId, threadId)
         const emails: NormalizedEmail[] = []
         for (const msgId of remoteThread.messageIds) {
           const email = await this.gateway.getEmail(ctx, accountId, msgId)
@@ -171,7 +173,7 @@ export class MailClient {
         if (!isOfflineError(error)) throw error
       }
     }
-    return this.store.getThread(accountId, threadId as any)
+    return this.store.getThread(accountId, threadId)
   }
 
   /**
@@ -264,7 +266,7 @@ export class MailClient {
       return {
         submissionId: `local-sub-${generateUUID()}`,
         idempotencyKey: submissionRequest.idempotencyKey,
-        messageId: `local-msg-${generateUUID()}` as any,
+        messageId: `local-msg-${generateUUID()}` as MessageId,
         status: 'queued',
         submittedAt: new Date().toISOString(),
       }

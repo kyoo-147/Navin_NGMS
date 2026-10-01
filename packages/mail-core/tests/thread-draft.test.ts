@@ -9,7 +9,7 @@ import {
 } from '../src/draft/draft-manager.js'
 import { buildSubmissionRequest, UndoSendManager } from '../src/submission/submission-handler.js'
 import type { NormalizedEmail } from '@navin/mail-gateway'
-import type { MailboxId, MessageId, ThreadId } from '@navin/contracts'
+import type { IdempotencyKey, MailboxId, MessageId, ThreadId } from '@navin/contracts'
 
 describe('Threads, Drafts, and Submissions', () => {
   const email1: NormalizedEmail = {
@@ -124,8 +124,8 @@ describe('Threads, Drafts, and Submissions', () => {
       sendExecuted = true
       return {
         submissionId: 'sub-123',
-        idempotencyKey: 'idem-1' as any,
-        messageId: 'msg-out' as any,
+        idempotencyKey: 'idem-1' as IdempotencyKey,
+        messageId: 'msg-out' as MessageId,
         status: 'sent',
         submittedAt: new Date().toISOString(),
       }
@@ -142,9 +142,13 @@ describe('Threads, Drafts, and Submissions', () => {
     expect(undoManager.isPending('sub-123')).toBe(false)
 
     // Test cancellation
-    const cancelPromise = undoManager.scheduleWithUndo('sub-cancel', 10, async () => {
-      return {} as any
-    })
+    const cancelPromise = undoManager.scheduleWithUndo('sub-cancel', 10, async () => ({
+      submissionId: 'sub-cancel',
+      idempotencyKey: 'idem-cancel' as IdempotencyKey,
+      messageId: 'msg-cancel' as MessageId,
+      status: 'sent',
+      submittedAt: new Date().toISOString(),
+    }))
     expect(undoManager.cancel('sub-cancel')).toBe(true)
     await expect(cancelPromise).rejects.toThrow('Submission cancelled by user undo')
 

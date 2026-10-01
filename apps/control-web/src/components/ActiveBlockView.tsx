@@ -1,11 +1,6 @@
 import React, { useState } from 'react'
 import type { SetupBlock, SetupSession } from '@navin/contracts'
-import {
-  Button,
-  Input,
-  StatusBadge,
-  type StatusTone,
-} from '@navin/ui-primitives'
+import { Button, Input, StatusBadge, type StatusTone } from '@navin/ui-primitives'
 
 export interface ActiveBlockViewProps {
   session: SetupSession
@@ -58,8 +53,23 @@ export function ActiveBlockView({
   const blockOutput = (block.value as { output?: unknown } | undefined)?.output
 
   return (
-    <section className="setup-active-block" style={{ padding: '16px', border: '1px solid #ddd', borderRadius: '8px', background: '#fafafa' }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+    <section
+      className="setup-active-block"
+      style={{
+        padding: '16px',
+        border: '1px solid #ddd',
+        borderRadius: '8px',
+        background: '#fafafa',
+      }}
+    >
+      <header
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginBottom: '12px',
+        }}
+      >
         <div>
           <h2 style={{ margin: '0 0 4px 0', fontSize: '1.25rem' }}>{block.title}</h2>
           <p style={{ margin: 0, color: '#555', fontSize: '0.9rem' }}>{block.summary}</p>
@@ -70,9 +80,7 @@ export function ActiveBlockView({
               Risk: {block.risk}
             </StatusBadge>
           )}
-          <StatusBadge tone={statusTone}>
-            {block.status}
-          </StatusBadge>
+          <StatusBadge tone={statusTone}>{block.status}</StatusBadge>
         </div>
       </header>
 
@@ -118,7 +126,8 @@ export function ActiveBlockView({
             ▲ Tier 3 Destructive Operation
           </strong>
           <p style={{ margin: '0 0 8px 0', fontSize: '0.875rem' }}>
-            To approve or apply this destructive change, you must type the exact confirmation phrase:{' '}
+            To approve or apply this destructive change, you must type the exact confirmation
+            phrase:{' '}
             <code style={{ background: '#eee', padding: '2px 4px', borderRadius: '3px' }}>
               {expectedPhrase}
             </code>
@@ -139,7 +148,11 @@ export function ActiveBlockView({
           onClick={handleAction}
           disabled={!canExecute}
         >
-          {isLoading ? 'Executing...' : block.status === 'passed' ? 'Completed' : `Run ${currentCommand}`}
+          {isLoading
+            ? 'Executing...'
+            : block.status === 'passed'
+              ? 'Completed'
+              : `Run ${currentCommand}`}
         </Button>
       </footer>
     </section>

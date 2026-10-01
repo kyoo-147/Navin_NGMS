@@ -23,7 +23,17 @@ export function StageNavigation({
   onSelectStage,
 }: StageNavigationProps): React.JSX.Element {
   return (
-    <nav aria-label="Setup journey stages" className="setup-stage-nav" style={{ display: 'flex', gap: '8px', padding: '12px 0', borderBottom: '1px solid #ccc', overflowX: 'auto' }}>
+    <nav
+      aria-label="Setup journey stages"
+      className="setup-stage-nav"
+      style={{
+        display: 'flex',
+        gap: '8px',
+        padding: '12px 0',
+        borderBottom: '1px solid #ccc',
+        overflowX: 'auto',
+      }}
+    >
       {SETUP_STAGES.map((stage) => {
         const isCurrent = stage === currentStage
         const isPassed = completedStages.includes(stage)
@@ -46,9 +56,7 @@ export function StageNavigation({
             }}
             aria-current={isCurrent ? 'step' : undefined}
           >
-            <StatusBadge tone={tone}>
-              {stage}
-            </StatusBadge>
+            <StatusBadge tone={tone}>{stage}</StatusBadge>
           </button>
         )
       })}

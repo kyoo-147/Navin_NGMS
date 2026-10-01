@@ -144,7 +144,7 @@ export class CalendarManager {
     const maxCount = event.recurrence.count ?? 50
     const interval = event.recurrence.interval ?? 1
 
-    let currentStart = new Date(eventStart)
+    const currentStart = new Date(eventStart)
     let count = 0
 
     while (

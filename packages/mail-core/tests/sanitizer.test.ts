@@ -69,7 +69,7 @@ describe('HTML Sanitizer & Security', () => {
         mimeType: 'image/png',
         size: 1024,
         cid: 'photo1',
-        blobId: '/blob/x\" onerror=\"alert(1)',
+        blobId: '/blob/x" onerror="alert(1)',
       },
     ])
     expect(malicious).not.toContain('onerror')
@@ -93,7 +93,7 @@ describe('HTML Sanitizer & Security', () => {
   it('detects suspicious links like domain mismatches and IP addresses', () => {
     const suspiciousHtml = `
       <p>Please log in to your account:</p>
-      <a href="https://phish.invalid/login">https://paypal.com</a>
+      <a href="https://phish.invalid/login">https://account.example.com</a>
       <a href="http://192.0.2.1/admin">System Admin</a>
       <a href="https://legit.example.com">https://legit.example.com/dashboard</a>
     `

@@ -25,7 +25,7 @@ export interface MailLayoutProps {
   threads: ThreadSummary[]
   selectedThread?: ThreadSummary
   selectedThreadIds: Set<string>
-  onSelectThread: (thread: ThreadSummary) => void
+  onSelectThread: (thread?: ThreadSummary) => void
   onToggleSelectThread: (threadId: string) => void
   onSelectAllThreads: (all: boolean) => void
   onStarToggle: (threadId: string, starred: boolean) => void
@@ -205,7 +205,7 @@ export const MailLayout: React.FC<MailLayoutProps> = ({
               >
                 <ThreadReader
                   thread={selectedThread}
-                  onBack={() => onSelectThread(undefined as any)}
+                  onBack={() => onSelectThread(undefined)}
                   onReply={(email: NormalizedEmail, replyAll: boolean) => {
                     onOpenCompose({
                       to: replyAll ? [...email.to, ...email.from] : email.from,

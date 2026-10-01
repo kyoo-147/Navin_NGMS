@@ -11,7 +11,6 @@ import type {
   ThreadId,
   MailMutationRequest,
   MailMutationResponse,
-  MailQueryRequest,
   MailQueryResponse,
   MailSubmissionRequest,
   MailSubmissionResponse,
@@ -213,7 +212,7 @@ describe('End-to-End Loopback JMAP & Multi-Account SQLite Restart Test', () => {
           destroyed: [],
         } as NormalizedChanges
       },
-      async queryMail(ctx: MailGatewayContext, _req: MailQueryRequest): Promise<MailQueryResponse> {
+      async queryMail(ctx: MailGatewayContext): Promise<MailQueryResponse> {
         const accountEmails = Array.from(serverEmails.values()).filter(
           (message) =>
             recipientByMessage.get(message.id) === ctx.sessionId ||
@@ -324,7 +323,7 @@ describe('End-to-End Loopback JMAP & Multi-Account SQLite Restart Test', () => {
           submittedAt: new Date().toISOString(),
         }
       },
-      async undoMutation(_ctx: MailGatewayContext, _undoToken: string) {
+      async undoMutation() {
         return { undone: true }
       },
       async getCapabilities() {
@@ -343,10 +342,10 @@ describe('End-to-End Loopback JMAP & Multi-Account SQLite Restart Test', () => {
     const loopbackGateway = createLoopbackGateway()
 
     // 1. Initialize Alice and Bob local stores and clients
-    let aliceStore = new MailStore({ path: aliceDbPath })
+    const aliceStore = new MailStore({ path: aliceDbPath })
     let bobStore = new MailStore({ path: bobDbPath })
 
-    let aliceClient = new MailClient({
+    const aliceClient = new MailClient({
       gateway: loopbackGateway,
       store: aliceStore,
       ctxFactory: (accId) => ({ sessionId: accId }),

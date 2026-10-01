@@ -6,7 +6,14 @@ import { randomBytes } from 'node:crypto'
 import { MailStore } from '../src/store.js'
 import { OutboxReconciler } from '../src/reconciler.js'
 import type { MailGateway, NormalizedEmail, NormalizedMailbox } from '@navin/mail-gateway'
-import type { FolderId, MailboxId, MessageId, ThreadId } from '@navin/contracts'
+import type {
+  FolderId,
+  MailMutationRequest,
+  MailboxId,
+  MailSubmissionRequest,
+  MessageId,
+  ThreadId,
+} from '@navin/contracts'
 
 describe('MailStore & OutboxReconciler', () => {
   let tempDir: string
@@ -325,7 +332,7 @@ describe('MailStore & OutboxReconciler', () => {
     const executedCalls: string[] = []
 
     const mockGateway = {
-      mutate: async (_ctx: unknown, req: any) => {
+      mutate: async (_ctx: unknown, req: MailMutationRequest) => {
         executedCalls.push(`mutate:${req.mutation}`)
         return {
           success: true,
@@ -334,7 +341,7 @@ describe('MailStore & OutboxReconciler', () => {
           newState: 'state-2',
         }
       },
-      submit: async (_ctx: unknown, req: any) => {
+      submit: async (_ctx: unknown, req: MailSubmissionRequest) => {
         executedCalls.push(`submit:${req.subject}`)
         return {
           submissionId: 'sub-1',

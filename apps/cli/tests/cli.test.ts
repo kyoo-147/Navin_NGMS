@@ -5,13 +5,27 @@ import { join } from 'node:path'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { runCli } from '../src/cli.js'
 
+interface SetupTestBlock {
+  kind: string
+  status: string
+  value?: unknown
+  [key: string]: unknown
+}
+
+interface SetupTestSession {
+  blocks: SetupTestBlock[]
+  status: string
+  currentStage: string
+  [key: string]: unknown
+}
+
 describe('Navin CLI', () => {
   let server: Server
   let port: number
   let baseUrl: string
   let tempConfigDir: string
   let previousConfigDir: string | undefined
-  const sessions = new Map<string, any>()
+  const sessions = new Map<string, SetupTestSession>()
 
   beforeAll(async () => {
     previousConfigDir = process.env.NAVIN_CONFIG_DIR
@@ -203,6 +217,7 @@ describe('Navin CLI', () => {
           return
         }
 
+        req.resume()
         req.on('end', () => {
           const kindMap: Record<string, string> = {
             discover: 'discovery',
@@ -220,7 +235,7 @@ describe('Navin CLI', () => {
           }
 
           const targetKind = kindMap[command]
-          const block = session.blocks.find((b: any) => b.kind === targetKind)
+          const block = session.blocks.find((candidate) => candidate.kind === targetKind)
           if (block) {
             block.status = 'passed'
             block.value = { output: { executed: command } }
@@ -250,7 +265,10 @@ describe('Navin CLI', () => {
   })
 
   afterAll(async () => {
-    await new Promise<void>((resolve) => server.close(() => resolve()))
+    await new Promise<void>((resolve) => {
+      server.close(() => resolve())
+      server.closeAllConnections()
+    })
     if (previousConfigDir === undefined) delete process.env.NAVIN_CONFIG_DIR
     else process.env.NAVIN_CONFIG_DIR = previousConfigDir
     rmSync(tempConfigDir, { recursive: true, force: true })

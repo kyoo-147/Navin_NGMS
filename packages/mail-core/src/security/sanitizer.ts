@@ -38,7 +38,8 @@ export interface UnsubscribeInfo {
  * allowRemoteImages; enabling them safely requires a separately authenticated
  * image proxy rather than inserting attacker-controlled URLs into the DOM.
  */
-export function sanitizeHtml(html: string, _options: SanitizeOptions = {}): SanitizeResult {
+export function sanitizeHtml(html: string, options: SanitizeOptions = {}): SanitizeResult {
+  void options
   if (!html) {
     return { sanitizedHtml: '', blockedRemoteImagesCount: 0, hasExternalLinks: false }
   }
