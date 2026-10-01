@@ -177,15 +177,24 @@ importers:
 
   apps/navind:
     dependencies:
+      '@navin/action-core':
+        specifier: workspace:*
+        version: link:../../packages/action-core
       '@navin/auth':
         specifier: workspace:*
         version: link:../../packages/auth
       '@navin/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@navin/engine-core':
+        specifier: workspace:*
+        version: link:../../packages/engine-core
       '@navin/mail-gateway':
         specifier: workspace:*
         version: link:../../packages/mail-gateway
+      '@navin/organization-core':
+        specifier: workspace:*
+        version: link:../../packages/organization-core
       '@navin/setup-core':
         specifier: workspace:*
         version: link:../../packages/setup-core
@@ -390,6 +399,28 @@ importers:
       '@types/node':
         specifier: 22.20.4
         version: 22.20.4
+      vitest:
+        specifier: 3.2.7
+        version: 3.2.7(@types/node@22.20.4)(jsdom@26.1.0)(tsx@4.23.15)
+
+  packages/organization-core:
+    dependencies:
+      '@navin/action-core':
+        specifier: workspace:*
+        version: link:../action-core
+      '@navin/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+      '@navin/engine-core':
+        specifier: workspace:*
+        version: link:../engine-core
+    devDependencies:
+      '@types/node':
+        specifier: 22.20.4
+        version: 22.20.4
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
       vitest:
         specifier: 3.2.7
         version: 3.2.7(@types/node@22.20.4)(jsdom@26.1.0)(tsx@4.23.15)
