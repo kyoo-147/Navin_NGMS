@@ -6,13 +6,13 @@
 
 <p>From an empty server to secure, automated, AI-operated email in minutes.</p>
 
-Open-source mail infrastructure for self-hosted and managed deployments.
+Source-available mail infrastructure for self-hosted and managed deployments.
 
 [Get started](#quick-start) · [Architecture](#architecture) · [Roadmap](#project-status-and-roadmap) · [Contributing](#contributing)
 
 </div>
 
-NGMS is an open-source mail infrastructure platform for individuals, teams, businesses, developers, and AI agents. It is designed to bring deployment, domain setup, mail operations, migration, deliverability, backup, recovery, monitoring, automation, and controlled AI assistance into one coherent system.
+NGMS is a source-available mail infrastructure platform for individuals, teams, businesses, developers, and AI agents. It is designed to bring deployment, domain setup, mail operations, migration, deliverability, backup, recovery, monitoring, automation, and controlled AI assistance into one coherent system.
 
 NGMS can run on infrastructure you control or as a managed production deployment operated by Navin Research. In either model, the goal is the same: mail infrastructure that is understandable, portable, observable, and recoverable.
 
@@ -314,6 +314,10 @@ Contributions should preserve the product boundaries and evidence standard:
 
 ## License
 
-NGMS is being developed as an open-source project. The repository's license and distribution policy are being finalized separately; until a `LICENSE` file is published, do not assume that a particular license grant applies to an individual file or release.
+NGMS is distributed under the [`PolyForm Noncommercial License 1.0.0`](LICENSE). The source is available for personal use, research, experimentation, testing, hobby projects, and other permitted noncommercial purposes. You may inspect, modify, and redistribute covered source under the license terms.
+
+Commercial use, commercial redistribution, commercial hosting, and commercial services based on NGMS are not permitted under the default license. Commercial use requires a separate written commercial license from the rights holder.
+
+Because the default license restricts commercial use, NGMS is **source-available**, not OSI-defined Open Source. See [`CONTRIBUTING.md`](CONTRIBUTING.md) for contribution terms and [`SECURITY.md`](SECURITY.md) for private vulnerability reporting.
 
 The project is designed to support self-hosting and managed operation without locking the underlying mail data or product contracts to one deployment provider.
