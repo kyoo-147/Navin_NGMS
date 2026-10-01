@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="assets/ngms-logo.png" alt="NGMS logo" width="180">
+
 # NGMS
 
 ## The next generation of mail infrastructure
