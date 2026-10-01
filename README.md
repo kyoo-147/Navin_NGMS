@@ -1,12 +1,10 @@
 <div align="center">
 
-<img src="assets/ngms-logo.png" alt="NGMS logo" width="180">
+<img src="assets/ngms-logo.png" alt="NGMS — the next generation of mail infrastructure" width="520">
 
-# NGMS
+<p><strong>The next generation of mail infrastructure</strong></p>
 
-## The next generation of mail infrastructure
-
-**From an empty server to secure, automated, AI-operated email in minutes.**
+<p>From an empty server to secure, automated, AI-operated email in minutes.</p>
 
 Open-source mail infrastructure for self-hosted and managed deployments.
 
