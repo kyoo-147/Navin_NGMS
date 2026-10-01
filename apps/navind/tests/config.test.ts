@@ -163,3 +163,59 @@ describe('config redaction', () => {
     expect(Object.isFrozen(redacted)).toBe(true)
   })
 })
+
+describe('mail configuration', () => {
+  it('defaults to an entirely unset upstream binding', () => {
+    const config = loadConfig({ env: {} })
+    expect(config.mail).toEqual({
+      jmapSessionUrl: null,
+      jmapAuthorization: null,
+      accountEmail: null,
+      senderIdentityId: null,
+    })
+  })
+
+  it('rejects a partially configured upstream mail binding', () => {
+    expect(() =>
+      loadConfig({ env: { NAVIN_MAIL_JMAP_SESSION_URL: 'http://127.0.0.1:1/jmap/session' } }),
+    ).toThrow(ConfigValidationError)
+  })
+
+  it('rejects a sender identity without a complete upstream binding', () => {
+    expect(() => loadConfig({ env: { NAVIN_MAIL_SENDER_IDENTITY_ID: 'als_sender' } })).toThrow(
+      ConfigValidationError,
+    )
+  })
+
+  it('rejects an invalid sender identity prefix', () => {
+    expect(() =>
+      loadConfig({
+        env: {
+          ...STRONG_SECRETS,
+          NAVIN_MAIL_JMAP_SESSION_URL: 'http://127.0.0.1:1234/jmap/session',
+          NAVIN_MAIL_JMAP_AUTHORIZATION: 'Basic c2VjcmV0',
+          NAVIN_MAIL_ACCOUNT_EMAIL: 'user@example.org',
+          NAVIN_MAIL_SENDER_IDENTITY_ID: 'sender-1',
+        },
+      }),
+    ).toThrow(ConfigValidationError)
+  })
+
+  it('accepts a fully configured binding and redacts the upstream authorization', () => {
+    const config = loadConfig({
+      env: {
+        ...STRONG_SECRETS,
+        NAVIN_MAIL_JMAP_SESSION_URL: 'http://127.0.0.1:1234/jmap/session',
+        NAVIN_MAIL_JMAP_AUTHORIZATION: 'Basic c2VjcmV0',
+        NAVIN_MAIL_ACCOUNT_EMAIL: 'user@example.org',
+        NAVIN_MAIL_SENDER_IDENTITY_ID: 'als_sender',
+      },
+    })
+
+    expect(config.mail.accountEmail).toBe('user@example.org')
+    expect(config.mail.senderIdentityId).toBe('als_sender')
+    const redacted = redactConfig(config)
+    expect(redacted.mail.jmapAuthorization).toBe(REDACTED)
+    expect(JSON.stringify(redacted)).not.toContain('Basic c2VjcmV0')
+  })
+})

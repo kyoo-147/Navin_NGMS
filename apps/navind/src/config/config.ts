@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { TypeCompiler } from '@sinclair/typebox/compiler'
 import { REDACTED } from '../logging/redact.js'
-import { ConfigSchema, type AppConfig } from './schema.js'
+import { ConfigSchema, type AppConfig, type MailConfig } from './schema.js'
 
 const compiledConfig = TypeCompiler.Compile(ConfigSchema)
 
@@ -70,6 +70,15 @@ function readBoolean(
   return fallback
 }
 
+function readMailConfig(env: NodeJS.ProcessEnv): MailConfig {
+  return {
+    jmapSessionUrl: env.NAVIN_MAIL_JMAP_SESSION_URL?.trim() || null,
+    jmapAuthorization: env.NAVIN_MAIL_JMAP_AUTHORIZATION?.trim() || null,
+    accountEmail: env.NAVIN_MAIL_ACCOUNT_EMAIL?.trim() || null,
+    senderIdentityId: env.NAVIN_MAIL_SENDER_IDENTITY_ID?.trim() || null,
+  }
+}
+
 function deepFreeze<T>(value: T): T {
   if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
     Object.freeze(value)
@@ -110,6 +119,7 @@ export function loadConfig(options: LoadConfigOptions = {}): AppConfig {
       sessionSecret: env.NAVIN_SESSION_SECRET?.trim() || '',
       encryptionKey: env.NAVIN_ENCRYPTION_KEY?.trim() || '',
     },
+    mail: readMailConfig(env),
     ...options.overrides,
   }
 
@@ -137,6 +147,29 @@ export function loadConfig(options: LoadConfigOptions = {}): AppConfig {
     }
   }
 
+  // Fail closed on a half-configured upstream mail binding: either every mail
+  // value is provided, or mail is intentionally unset and every Mail endpoint
+  // rejects requests.
+  const mailValues = [
+    candidate.mail.jmapSessionUrl,
+    candidate.mail.jmapAuthorization,
+    candidate.mail.accountEmail,
+  ]
+  const mailSetCount = mailValues.filter((value) => value !== null).length
+  if (mailSetCount > 0 && mailSetCount < mailValues.length) {
+    issues.push({
+      path: 'NAVIN_MAIL_*',
+      message:
+        'upstream mail binding must be fully configured (session URL, authorization, account email) or entirely unset',
+    })
+  }
+  if (candidate.mail.senderIdentityId !== null && mailSetCount < mailValues.length) {
+    issues.push({
+      path: 'NAVIN_MAIL_SENDER_IDENTITY_ID',
+      message: 'sender identity requires a complete upstream mail binding',
+    })
+  }
+
   if (issues.length > 0) {
     throw new ConfigValidationError(issues)
   }
@@ -151,6 +184,10 @@ export function redactConfig(config: AppConfig): AppConfig {
     secrets: {
       sessionSecret: REDACTED,
       encryptionKey: REDACTED,
+    },
+    mail: {
+      ...config.mail,
+      jmapAuthorization: config.mail.jmapAuthorization === null ? null : REDACTED,
     },
   })
 }

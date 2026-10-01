@@ -9,6 +9,10 @@ import { createDatabaseCheck, createMigrationsCheck } from '../health/checks.js'
 import { DefaultHealthRegistry } from '../health/registry.js'
 import { buildServer } from '../http/server.js'
 import { ControlAuthorization } from '../setup/auth.js'
+import { MailAuthorization } from '../mail/auth.js'
+import { MailService } from '../mail/service.js'
+import type { MailAccountBinding } from '../mail/credentials.js'
+import type { MailConfig } from '../config/schema.js'
 import { SetupService } from '@navin/setup-core'
 import type { Database } from '../ports/database.js'
 import type { Container } from './container.js'
@@ -37,6 +41,7 @@ export class NavinKernel {
   private server: FastifyInstance | undefined
   private database: Database | undefined
   private auth: ControlAuthorization | undefined
+  private mail: MailService | undefined
   private started = false
   private stopPromise: Promise<void> | undefined
 
@@ -99,7 +104,35 @@ export class NavinKernel {
       )
       this.auth = auth
 
-      const server = buildServer({ config, clock, ids, logger, health, startedAt, setup, auth })
+      const mailAccount = mailAccountFromConfig(config.mail)
+      const mail = new MailService({
+        databasePath: config.databasePath,
+        clock,
+        sessions: auth.store,
+        account: mailAccount,
+        sender:
+          mailAccount && config.mail.senderIdentityId
+            ? { identityId: config.mail.senderIdentityId, address: mailAccount.email }
+            : null,
+      })
+      this.mail = mail
+      const mailAuth = new MailAuthorization(auth.service, {
+        env: process.env,
+        allowBootstrap: config.environment !== 'production',
+      })
+
+      const server = buildServer({
+        config,
+        clock,
+        ids,
+        logger,
+        health,
+        startedAt,
+        setup,
+        auth,
+        mail,
+        mailAuth,
+      })
       this.server = server
       await server.listen({ host: config.host, port: config.port })
     } catch (error) {
@@ -147,6 +180,15 @@ export class NavinKernel {
       }
     }
 
+    if (this.mail) {
+      try {
+        this.mail.close()
+      } catch (error) {
+        logger.error('failed to close mail service', { err: error })
+      }
+      this.mail = undefined
+    }
+
     if (this.auth) {
       try {
         this.auth.close()
@@ -169,4 +211,19 @@ export class NavinKernel {
     this.started = false
     logger.info('navind stopped')
   }
+}
+
+/**
+ * A complete upstream binding enables the Mail BFF; an incomplete or absent
+ * binding leaves it disabled so every Mail endpoint fails closed.
+ */
+function mailAccountFromConfig(mail: MailConfig): MailAccountBinding | null {
+  if (mail.jmapSessionUrl && mail.jmapAuthorization && mail.accountEmail) {
+    return {
+      sessionUrl: mail.jmapSessionUrl,
+      authorization: mail.jmapAuthorization,
+      email: mail.accountEmail,
+    }
+  }
+  return null
 }

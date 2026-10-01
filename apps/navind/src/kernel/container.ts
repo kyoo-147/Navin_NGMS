@@ -41,7 +41,11 @@ export function createContainer(
     sink: options.sink,
     // Register configuration secrets so they are scrubbed even if they surface
     // inside a free-text message or stack trace.
-    redactLiterals: [config.secrets.sessionSecret, config.secrets.encryptionKey],
+    redactLiterals: [
+      config.secrets.sessionSecret,
+      config.secrets.encryptionKey,
+      ...(config.mail.jmapAuthorization ? [config.mail.jmapAuthorization] : []),
+    ],
     base: {
       service: SERVICE_NAME,
       version: SERVICE_VERSION,

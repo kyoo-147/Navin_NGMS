@@ -8,6 +8,12 @@ export type HttpErrorCode =
   | 'RATE_LIMITED'
   | 'INTERNAL_ERROR'
   | 'SERVICE_UNAVAILABLE'
+  | 'RISK_STEP_UP_REQUIRED'
+  | 'APPROVAL_REQUIRED'
+  | 'IDEMPOTENCY_CONFLICT'
+  | 'PRECONDITION_FAILED'
+  | 'ACTION_BLOCKED'
+  | 'SESSION_EXPIRED'
 
 export interface ErrorEnvelope {
   error: {

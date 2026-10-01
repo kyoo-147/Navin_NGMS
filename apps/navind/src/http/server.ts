@@ -14,6 +14,8 @@ import {
 import { registerRoutes } from './routes.js'
 import type { SetupService } from '@navin/setup-core'
 import type { ControlAuthorization } from '../setup/auth.js'
+import type { MailAuthorization } from '../mail/auth.js'
+import type { MailService } from '../mail/service.js'
 
 export interface ServerDependencies {
   config: AppConfig
@@ -24,6 +26,8 @@ export interface ServerDependencies {
   startedAt: number
   setup?: SetupService
   auth?: ControlAuthorization
+  mail?: MailService
+  mailAuth?: MailAuthorization
 }
 
 export function buildServer(deps: ServerDependencies): FastifyInstance {
@@ -48,6 +52,8 @@ export function buildServer(deps: ServerDependencies): FastifyInstance {
     startedAt: deps.startedAt,
     setup: deps.setup,
     auth: deps.auth,
+    mail: deps.mail,
+    mailAuth: deps.mailAuth,
   })
 
   return app

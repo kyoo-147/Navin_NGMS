@@ -53,6 +53,38 @@ tests/          Unit, SQLite restart/concurrency and real-process tests
 Every response echoes the request correlation id via the `x-correlation-id`
 header and in the body.
 
+### Mail BFF
+
+Browser Mail surfaces call `navind`, never the mail engine. The Mail BFF mounts
+the normalized JMAP gateway under `/api/v1/mail/*` behind a separate
+`navin-mail` relying party and the `mail` surface. Upstream JMAP session URLs and
+Authorization values stay server-side; callers only ever present a Navin session
+(cookie or bearer token) and normalized requests.
+
+| Method | Path | Purpose |
+| ------ | ---- | ------- |
+| POST | `/api/v1/mail/auth/login` | Mail login; issues the host-only mail session. |
+| GET | `/api/v1/mail/auth/session` | Current mail session identity. |
+| POST | `/api/v1/mail/auth/logout` | Revoke the mail session. |
+| GET | `/api/v1/mail/session` | Normalized upstream session: accounts and capabilities. |
+| GET | `/api/v1/mail/mailboxes?accountId=` | Normalized mailbox list. |
+| GET | `/api/v1/mail/messages/:messageId?accountId=` | Normalized message. |
+| GET | `/api/v1/mail/threads/:threadId?accountId=` | Normalized thread. |
+| POST | `/api/v1/mail/query` | Normalized query (returns message/thread ids). |
+| POST | `/api/v1/mail/mutations` | Idempotent mutation. |
+| POST | `/api/v1/mail/submissions` | Idempotent submission. |
+| GET | `/api/v1/mail/events` | SSE mail events (in-process ring; `Last-Event-ID` resumes within one process). |
+
+When no upstream mail binding is configured, **every** Mail endpoint fails
+closed with `503 SERVICE_UNAVAILABLE`; it never degrades to an unauthenticated
+or fake backend.
+
+Submissions are validated server-side against the configured sender binding:
+if no sender identity is configured, or `senderIdentityId`/`from.address` do
+not match the configured identity/address (address compared case-insensitively;
+the display name carries no authority), the request is rejected with
+`403 FORBIDDEN` before any upstream call rather than being silently rewritten.
+
 ## Configuration
 
 Configuration is read from the environment and validated on boot. Invalid input
@@ -71,6 +103,25 @@ fails startup with a structured `ConfigValidationError`.
 | `NAVIN_BODY_LIMIT_BYTES`   | `1048576`          | Maximum request body size.                     |
 | `NAVIN_SESSION_SECRET`     | dev placeholder    | Required (and non-default) in production.      |
 | `NAVIN_ENCRYPTION_KEY`     | dev placeholder    | Required (and non-default) in production.      |
+| `NAVIN_MAIL_JMAP_SESSION_URL` | unset           | Upstream JMAP session URL.                     |
+| `NAVIN_MAIL_JMAP_AUTHORIZATION` | unset         | Upstream Authorization header value (secret).  |
+| `NAVIN_MAIL_ACCOUNT_EMAIL` | unset              | Mailbox address mail sessions must match.      |
+| `NAVIN_MAIL_SENDER_IDENTITY_ID` | unset         | Authorized sender identity (`usr_`/`als_`); enables compose/send. |
+
+The three `NAVIN_MAIL_JMAP_*`/`NAVIN_MAIL_ACCOUNT_EMAIL` values are
+all-or-nothing: providing some but not all fails config validation. Leaving
+them all unset disables the Mail BFF. `NAVIN_MAIL_SENDER_IDENTITY_ID` is
+optional and requires the complete binding; without it Mail is read-only and
+compose/send is disabled.
+
+The mail event stream is a bounded in-process ring. `Last-Event-ID` resumes a
+reconnect within the same process only; after a daemon restart a client must
+reconcile from authoritative state — the stream is not durable or
+restart-resumable.
+
+For local development only, `NAVIN_MAIL_BOOTSTRAP_EMAIL` and
+`NAVIN_MAIL_BOOTSTRAP_PASSWORD` seed a `mail.user` account on boot. This
+bootstrap is ignored in `production`.
 
 ## Scripts
 

@@ -34,6 +34,7 @@
   "dependencies": {
     "@navin/auth": "workspace:*",
     "@navin/contracts": "workspace:*",
+    "@navin/mail-gateway": "workspace:*",
     "@navin/setup-core": "workspace:*",
     "@sinclair/typebox": "^0.34.48",
     "fastify": "^5.12.5"

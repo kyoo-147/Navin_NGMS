@@ -19,8 +19,8 @@ export interface ControlLoginInput {
 }
 
 export class ControlAuthorization {
-  private readonly store: SqliteAuthStore
-  private readonly service: AuthService
+  readonly store: SqliteAuthStore
+  readonly service: AuthService
 
   constructor(
     databasePath: string,
@@ -33,7 +33,7 @@ export class ControlAuthorization {
     const key = createHash('sha256').update(`${sessionSecret}\n${encryptionKey}`).digest()
     this.service = new AuthService({
       store: this.store,
-      mailIssuer: createMailIssuer({ key, clock, keyId: 'mail-unused' }),
+      mailIssuer: createMailIssuer({ key, clock, keyId: 'mail-1' }),
       controlIssuer: createControlIssuer({ key, clock, keyId: 'control-1' }),
       clock,
       random: new SystemRandom(),

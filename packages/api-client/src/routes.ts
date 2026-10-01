@@ -11,6 +11,15 @@ export const routes = {
     login: '/auth/login',
   },
   mail: {
+    auth: {
+      login: '/mail/auth/login',
+      session: '/mail/auth/session',
+      logout: '/mail/auth/logout',
+    },
+    session: '/mail/session',
+    mailboxes: '/mail/mailboxes',
+    message: (messageId: string) => `/mail/messages/${segment(messageId)}`,
+    thread: (threadId: string) => `/mail/threads/${segment(threadId)}`,
     query: '/mail/query',
     mutations: '/mail/mutations',
     submissions: '/mail/submissions',
