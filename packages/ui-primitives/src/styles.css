@@ -1,0 +1,885 @@
+/**
+ * Navin UI primitives — minimal functional styling.
+ * Consumes semantic design tokens only (see @navin/design-system tokens.css).
+ * No business layout, no decorative motion.
+ */
+
+.navin-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ------------------------------------------------------------------ Button */
+
+.navin-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  max-width: 100%;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm, 6px);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  background: transparent;
+  color: var(--text-primary);
+  transition:
+    background-color var(--motion-fast, 120ms) var(--motion-ease, ease),
+    border-color var(--motion-fast, 120ms) var(--motion-ease, ease);
+}
+
+.navin-btn:focus-visible,
+.navin-btn--icon:focus-visible {
+  outline: 2px solid var(--accent, #7bcb45);
+  outline-offset: 2px;
+}
+
+.navin-btn:disabled,
+.navin-btn[aria-busy='true'] {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.navin-btn--primary {
+  background: var(--accent, #7bcb45);
+  color: #ffffff;
+  border-color: var(--accent, #7bcb45);
+}
+.navin-btn--primary:hover:not(:disabled) {
+  background: var(--accent-hover, #6dbc39);
+  border-color: var(--accent-hover, #6dbc39);
+}
+.navin-btn--primary:active:not(:disabled) {
+  background: var(--accent-active, #5ea92f);
+  border-color: var(--accent-active, #5ea92f);
+}
+
+.navin-btn--secondary {
+  background: var(--bg-surface, #ffffff);
+  border-color: var(--border-default, #e4e5e0);
+}
+.navin-btn--secondary:hover:not(:disabled) {
+  background: var(--bg-hover, #f2f2ee);
+}
+
+.navin-btn--ghost {
+  background: transparent;
+}
+.navin-btn--ghost:hover:not(:disabled) {
+  background: var(--bg-hover, #f2f2ee);
+}
+
+.navin-btn--danger {
+  background: var(--danger, #c83e3a);
+  border-color: var(--danger, #c83e3a);
+  color: #ffffff;
+}
+.navin-btn--danger:hover:not(:disabled) {
+  filter: brightness(0.95);
+}
+
+.navin-btn--sm {
+  height: 28px;
+  padding: 0 var(--space-2, 8px);
+  font-size: 13px;
+}
+.navin-btn--md {
+  height: 36px;
+  padding: 0 var(--space-3, 12px);
+}
+.navin-btn--lg {
+  height: 40px;
+  padding: 0 var(--space-4, 16px);
+  font-size: 15px;
+}
+
+.navin-btn--block {
+  width: 100%;
+}
+
+.navin-btn--icon.navin-btn--sm {
+  width: 28px;
+  padding: 0;
+}
+.navin-btn--icon.navin-btn--md {
+  width: 36px;
+  padding: 0;
+}
+.navin-btn--icon.navin-btn--lg {
+  width: 40px;
+  padding: 0;
+}
+
+.navin-btn__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navin-btn__icon {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+/* ----------------------------------------------------------------- Spinner */
+
+.navin-spinner {
+  display: inline-block;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-top-color: transparent;
+  animation: navin-spin 700ms linear infinite;
+}
+.navin-spinner--sm {
+  width: 14px;
+  height: 14px;
+}
+.navin-spinner--md {
+  width: 18px;
+  height: 18px;
+}
+.navin-spinner--lg {
+  width: 24px;
+  height: 24px;
+  border-width: 3px;
+}
+
+@keyframes navin-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navin-spinner {
+    animation-duration: 1600ms;
+  }
+}
+
+/* ------------------------------------------------------------------ Fields */
+
+.navin-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+  max-width: 100%;
+}
+
+.navin-field__label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary, #60635d);
+}
+
+.navin-field__required {
+  color: var(--danger, #c83e3a);
+  margin-left: 2px;
+}
+
+.navin-field__hint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-tertiary, #8a8d86);
+}
+
+.navin-field__error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--danger, #c83e3a);
+}
+
+.navin-field--disabled .navin-field__label {
+  color: var(--text-tertiary, #8a8d86);
+}
+
+.navin-input,
+.navin-select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--border-default, #e4e5e0);
+  border-radius: var(--radius-sm, 6px);
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #171816);
+  font: inherit;
+  font-size: 14px;
+  padding: 0 var(--space-3, 12px);
+  transition: border-color var(--motion-fast, 120ms) var(--motion-ease, ease);
+}
+
+.navin-input--sm,
+.navin-select--sm {
+  height: 32px;
+  font-size: 13px;
+}
+.navin-input--md,
+.navin-select--md {
+  height: 36px;
+}
+.navin-input--lg,
+.navin-select--lg {
+  height: 42px;
+  font-size: 15px;
+}
+
+.navin-input::placeholder {
+  color: var(--text-tertiary, #8a8d86);
+}
+
+.navin-input:focus-visible,
+.navin-select:focus-visible {
+  outline: 2px solid var(--accent, #7bcb45);
+  outline-offset: 1px;
+  border-color: var(--accent, #7bcb45);
+}
+
+.navin-input--invalid,
+.navin-select.navin-input--invalid {
+  border-color: var(--danger, #c83e3a);
+}
+
+.navin-input:disabled,
+.navin-select:disabled {
+  background: var(--bg-subtle, #f6f6f3);
+  color: var(--text-disabled, #b5b7b1);
+  cursor: not-allowed;
+}
+
+/* ---------------------------------------------------------------- Checkbox */
+
+.navin-checkbox-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+}
+
+.navin-checkbox {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--space-2, 8px);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-primary, #171816);
+}
+
+.navin-checkbox__input {
+  margin: 2px 0 0;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  accent-color: var(--accent, #7bcb45);
+}
+
+.navin-checkbox__input:focus-visible {
+  outline: 2px solid var(--accent, #7bcb45);
+  outline-offset: 2px;
+}
+
+.navin-checkbox__input:disabled {
+  cursor: not-allowed;
+}
+
+.navin-field--disabled .navin-checkbox {
+  color: var(--text-disabled, #b5b7b1);
+  cursor: not-allowed;
+}
+
+/* ------------------------------------------------------------------ Dialog */
+
+.navin-dialog__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4, 16px);
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.navin-dialog {
+  width: 100%;
+  max-width: 480px;
+  max-height: calc(100vh - var(--space-8, 32px));
+  overflow: auto;
+  box-sizing: border-box;
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #171816);
+  border: 1px solid var(--border-default, #e4e5e0);
+  border-radius: var(--radius-lg, 10px);
+  box-shadow: var(--shadow-modal, 0 16px 48px rgba(0, 0, 0, 0.12));
+  padding: var(--space-5, 20px);
+}
+
+.navin-dialog:focus-visible {
+  outline: none;
+}
+
+.navin-dialog__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3, 12px);
+}
+
+.navin-dialog__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.navin-dialog__close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 auto;
+  border: 0;
+  border-radius: var(--radius-sm, 6px);
+  background: transparent;
+  color: var(--text-secondary, #60635d);
+  cursor: pointer;
+}
+.navin-dialog__close:hover {
+  background: var(--bg-hover, #f2f2ee);
+}
+.navin-dialog__close:focus-visible {
+  outline: 2px solid var(--accent, #7bcb45);
+  outline-offset: 2px;
+}
+
+.navin-dialog__description {
+  margin: var(--space-2, 8px) 0 0;
+  color: var(--text-secondary, #60635d);
+  font-size: 14px;
+}
+
+.navin-dialog__body {
+  margin-top: var(--space-4, 16px);
+  font-size: 14px;
+}
+
+.navin-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2, 8px);
+  margin-top: var(--space-5, 20px);
+}
+
+/* ------------------------------------------------------------------- Toast */
+
+.navin-toast-region {
+  position: fixed;
+  right: var(--space-4, 16px);
+  bottom: var(--space-4, 16px);
+  z-index: 1100;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+  max-width: 360px;
+  width: calc(100% - var(--space-8, 32px));
+  pointer-events: none;
+}
+
+.navin-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 12px);
+  padding: var(--space-3, 12px);
+  border: 1px solid var(--border-default, #e4e5e0);
+  border-left-width: 3px;
+  border-radius: var(--radius-md, 8px);
+  background: var(--bg-surface, #ffffff);
+  color: var(--text-primary, #171816);
+  box-shadow: var(--shadow-popover, 0 6px 24px rgba(0, 0, 0, 0.08));
+}
+
+.navin-toast__content {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.navin-toast__title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.navin-toast__description {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary, #60635d);
+  overflow-wrap: anywhere;
+}
+
+.navin-toast__action {
+  margin-top: var(--space-2, 8px);
+}
+
+.navin-toast__icon {
+  flex: 0 0 auto;
+  display: inline-flex;
+  margin-top: 1px;
+}
+
+.navin-toast__close {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: var(--radius-xs, 4px);
+  background: transparent;
+  color: var(--text-secondary, #60635d);
+  cursor: pointer;
+}
+.navin-toast__close:hover {
+  background: var(--bg-hover, #f2f2ee);
+}
+.navin-toast__close:focus-visible {
+  outline: 2px solid var(--accent, #7bcb45);
+  outline-offset: 2px;
+}
+
+.navin-toast--info {
+  border-left-color: var(--info, #456b8c);
+}
+.navin-toast--info .navin-toast__icon {
+  color: var(--info, #456b8c);
+}
+.navin-toast--success {
+  border-left-color: var(--success, #2f7d32);
+}
+.navin-toast--success .navin-toast__icon {
+  color: var(--success, #2f7d32);
+}
+.navin-toast--warning {
+  border-left-color: var(--warning, #a66a00);
+}
+.navin-toast--warning .navin-toast__icon {
+  color: var(--warning, #a66a00);
+}
+.navin-toast--danger {
+  border-left-color: var(--danger, #c83e3a);
+}
+.navin-toast--danger .navin-toast__icon {
+  color: var(--danger, #c83e3a);
+}
+
+/* ------------------------------------------------------------------ Status */
+
+.navin-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  font-size: 13px;
+  color: var(--text-secondary, #60635d);
+}
+
+.navin-status__dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--text-tertiary, #8a8d86);
+}
+
+.navin-status__dot--neutral {
+  background: var(--text-tertiary, #8a8d86);
+}
+.navin-status__dot--info {
+  background: var(--info, #456b8c);
+}
+.navin-status__dot--success {
+  background: var(--success, #2f7d32);
+}
+.navin-status__dot--warning {
+  background: var(--warning, #a66a00);
+}
+.navin-status__dot--danger {
+  background: var(--danger, #c83e3a);
+}
+.navin-status__dot--accent {
+  background: var(--accent, #7bcb45);
+}
+
+.navin-status__dot--pulse {
+  animation: navin-pulse 1400ms var(--motion-ease, ease) infinite;
+}
+
+@keyframes navin-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.navin-status__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  max-width: 100%;
+  padding: 1px var(--space-2, 8px);
+  border: 1px solid var(--border-default, #e4e5e0);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  color: var(--text-secondary, #60635d);
+  background: var(--bg-subtle, #f6f6f3);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navin-badge--info {
+  color: var(--info, #456b8c);
+  background: var(--info-soft, #eff5fa);
+  border-color: transparent;
+}
+.navin-badge--success {
+  color: var(--success, #2f7d32);
+  background: var(--success-soft, #edf7ee);
+  border-color: transparent;
+}
+.navin-badge--warning {
+  color: var(--warning, #a66a00);
+  background: var(--warning-soft, #fff6e5);
+  border-color: transparent;
+}
+.navin-badge--danger {
+  color: var(--danger, #c83e3a);
+  background: var(--danger-soft, #fff0ef);
+  border-color: transparent;
+}
+.navin-badge--accent {
+  color: var(--accent-text, #32691a);
+  background: var(--accent-soft, #eef8e8);
+  border-color: transparent;
+}
+
+/* ---------------------------------------------------------------- Progress */
+
+.navin-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  width: 100%;
+}
+
+.navin-progress__track {
+  position: relative;
+  flex: 1 1 auto;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--bg-active, #ecede8);
+  overflow: hidden;
+}
+
+.navin-progress__bar {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent, #7bcb45);
+  transition: width var(--motion-default, 180ms) var(--motion-ease, ease);
+}
+.navin-progress__bar--success {
+  background: var(--success, #2f7d32);
+}
+.navin-progress__bar--warning {
+  background: var(--warning, #a66a00);
+}
+.navin-progress__bar--danger {
+  background: var(--danger, #c83e3a);
+}
+
+.navin-progress__track--indeterminate .navin-progress__bar {
+  width: 35%;
+  animation: navin-indeterminate 1200ms var(--motion-ease, ease) infinite;
+}
+
+@keyframes navin-indeterminate {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
+  }
+}
+
+.navin-progress__value {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--text-secondary, #60635d);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------- Skeleton */
+
+.navin-skeleton-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 8px);
+}
+
+.navin-skeleton {
+  display: block;
+  background: var(--bg-active, #ecede8);
+  border-radius: var(--radius-xs, 4px);
+  animation: navin-skeleton 1400ms var(--motion-ease, ease) infinite;
+}
+.navin-skeleton--text {
+  height: 12px;
+  width: 100%;
+}
+.navin-skeleton--rect {
+  border-radius: var(--radius-sm, 6px);
+}
+.navin-skeleton--circle {
+  border-radius: 50%;
+}
+
+@keyframes navin-skeleton {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .navin-skeleton,
+  .navin-status__dot--pulse,
+  .navin-progress__track--indeterminate .navin-progress__bar {
+    animation: none;
+  }
+}
+
+/* ------------------------------------------------------- Empty / Error states */
+
+.navin-empty,
+.navin-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-8, 32px) var(--space-4, 16px);
+  text-align: center;
+  border: 1px solid var(--border-default, #e4e5e0);
+  border-radius: var(--radius-md, 8px);
+  color: var(--text-secondary, #60635d);
+}
+
+.navin-empty__icon,
+.navin-error__icon {
+  display: inline-flex;
+  color: var(--text-tertiary, #8a8d86);
+}
+.navin-error__icon {
+  color: var(--danger, #c83e3a);
+}
+
+.navin-empty__title,
+.navin-error__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary, #171816);
+  overflow-wrap: anywhere;
+}
+
+.navin-empty__description,
+.navin-error__description,
+.navin-error__cause {
+  margin: 0;
+  font-size: 14px;
+  max-width: 48ch;
+  overflow-wrap: anywhere;
+}
+
+.navin-error__cause {
+  font-size: 12px;
+  color: var(--text-tertiary, #8a8d86);
+}
+
+.navin-empty__action,
+.navin-error__action {
+  margin-top: var(--space-2, 8px);
+}
+
+/* -------------------------------------------------------------- Split pane */
+
+.navin-split {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.navin-split--horizontal {
+  flex-direction: row;
+}
+.navin-split--vertical {
+  flex-direction: column;
+}
+
+.navin-split__pane {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+
+.navin-split__divider {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--divider, #ecede9);
+  cursor: col-resize;
+}
+.navin-split--horizontal > .navin-split__divider {
+  width: 6px;
+  cursor: col-resize;
+}
+.navin-split--vertical > .navin-split__divider {
+  height: 6px;
+  cursor: row-resize;
+}
+
+.navin-split__divider:hover,
+.navin-split__divider:focus-visible {
+  background: var(--border-strong, #d3d5cf);
+}
+.navin-split__divider:focus-visible {
+  outline: 2px solid var(--accent, #7bcb45);
+  outline-offset: -1px;
+}
+
+.navin-split__grip {
+  display: block;
+  background: var(--text-tertiary, #8a8d86);
+  border-radius: 999px;
+}
+.navin-split--horizontal > .navin-split__divider > .navin-split__grip {
+  width: 2px;
+  height: 24px;
+}
+.navin-split--vertical > .navin-split__divider > .navin-split__grip {
+  width: 24px;
+  height: 2px;
+}
+
+/* ---------------------------------------------------------------- List rows */
+
+.navin-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--border-default, #e4e5e0);
+  border-radius: var(--radius-md, 8px);
+  overflow: hidden;
+  background: var(--bg-surface, #ffffff);
+}
+
+.navin-list-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  min-height: var(--mail-row, 40px);
+  padding: var(--space-2, 8px) var(--space-3, 12px);
+  border-bottom: 1px solid var(--divider, #ecede9);
+  color: var(--text-primary, #171816);
+  font-size: 14px;
+  cursor: pointer;
+}
+.navin-list-row:last-child {
+  border-bottom: 0;
+}
+
+.navin-list-row:hover {
+  background: var(--bg-hover, #f2f2ee);
+}
+
+.navin-list-row:focus-visible {
+  outline: 2px solid var(--accent, #7bcb45);
+  outline-offset: -2px;
+}
+
+.navin-list-row--selected {
+  background: var(--accent-soft, #eef8e8);
+}
+
+.navin-list-row--disabled {
+  color: var(--text-disabled, #b5b7b1);
+  cursor: not-allowed;
+}
+.navin-list-row--disabled:hover {
+  background: transparent;
+}
+
+.navin-list-row__leading,
+.navin-list-row__trailing {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+}
+
+.navin-list-row__main {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navin-list-row__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.navin-list-row__description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  color: var(--text-secondary, #60635d);
+}
+
+.navin-list-row__meta {
+  flex: 0 0 auto;
+  font-size: 12px;
+  color: var(--text-tertiary, #8a8d86);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
