@@ -1,0 +1,44 @@
+{
+  "name": "@navin/navind",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Navin platform daemon kernel: Fastify lifecycle, validated config, SQLite WAL migrations, health and graceful shutdown",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "bin": {
+    "navind": "./dist/main.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node dist/main.js",
+    "dev": "tsx src/main.ts",
+    "build": "tsc",
+    "clean": "node -e \"require('fs').rmSync('dist', { recursive: true, force: true })\"",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@sinclair/typebox": "^0.34.48",
+    "fastify": "^5.12.5"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.4",
+    "tsx": "4.23.15",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

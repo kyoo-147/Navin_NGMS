@@ -1,0 +1,54 @@
+import type { FastifyInstance } from 'fastify'
+import type { Clock } from '../ports/clock.js'
+import type { HealthRegistry } from '../ports/health.js'
+import { API_VERSION, SERVICE_NAME, SERVICE_VERSION } from '../version.js'
+import type { AppConfig } from '../config/schema.js'
+
+export interface RouteDependencies {
+  config: AppConfig
+  clock: Clock
+  health: HealthRegistry
+  startedAt: number
+}
+
+export function registerRoutes(app: FastifyInstance, deps: RouteDependencies): void {
+  app.get('/health', (request) => {
+    return {
+      status: 'ok',
+      service: SERVICE_NAME,
+      version: SERVICE_VERSION,
+      apiVersion: API_VERSION,
+      environment: deps.config.environment,
+      uptimeMs: Date.now() - deps.startedAt,
+      timestamp: deps.clock.nowIso(),
+      correlationId: request.correlationId,
+    }
+  })
+
+  app.get('/ready', async (request, reply) => {
+    const report = await deps.health.run()
+    const ready = report.state === 'healthy'
+    return reply.status(ready ? 200 : 503).send({
+      status: ready ? 'ready' : 'not_ready',
+      service: SERVICE_NAME,
+      version: SERVICE_VERSION,
+      checks: report.checks,
+      timestamp: report.timestamp,
+      correlationId: request.correlationId,
+    })
+  })
+
+  app.get('/meta', (request) => {
+    return {
+      service: SERVICE_NAME,
+      version: SERVICE_VERSION,
+      apiVersion: API_VERSION,
+      environment: deps.config.environment,
+      node: process.version,
+      platform: process.platform,
+      pid: process.pid,
+      startedAt: new Date(deps.startedAt).toISOString(),
+      correlationId: request.correlationId,
+    }
+  })
+}
