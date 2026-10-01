@@ -1,21 +1,35 @@
 import type { SetupBlock, SetupSession } from '@navin/contracts'
+import type { AliasActionView } from './client.js'
 
 export function statusBadge(status: string): string {
   switch (status) {
     case 'passed':
-      return '✓ passed'
+    case 'completed':
+      return '✓ ' + status
     case 'running':
-      return '⧖ running'
+    case 'applying':
+    case 'verifying':
+    case 'rolling_back':
+    case 'awaiting_approval':
+      return '⧖ ' + status
+    case 'staged':
+    case 'planned':
     case 'ready':
-      return '• ready'
+    case 'queued':
+    case 'approved':
+      return '• ' + status
     case 'warning':
       return '▲ warning'
     case 'failed':
-      return '✗ failed'
+    case 'rollback_failed':
+    case 'rejected':
+      return '✗ ' + status
     case 'blocked':
       return '⊘ blocked'
     case 'retrying':
       return '↻ retrying'
+    case 'rolled_back':
+      return '↩ rolled_back'
     default:
       return `○ ${status}`
   }
@@ -58,4 +72,42 @@ export function formatDiffBlock(block: SetupBlock): string {
     return 'No diff recorded yet.'
   }
   return JSON.stringify(output, null, 2)
+}
+
+export function formatAliasActionView(view: AliasActionView): string {
+  const { action } = view
+  const lines = [
+    `Action:       ${action.id}`,
+    `Name:         ${action.name}`,
+    `Status:       ${statusBadge(action.status)}`,
+    `Stage:        ${action.stage}`,
+    `Risk:         Tier ${action.riskTier}`,
+    `Rollbackable: ${action.canRollback ? 'yes' : 'no'}`,
+    `Alias:        ${String(action.parameters.address ?? '-')} -> ${String(action.parameters.target ?? '-')}`,
+  ]
+  if (action.diff) {
+    lines.push(`Diff:         ${action.diff.summary}`)
+    for (const change of action.diff.changes) {
+      const value = change.newValue === undefined ? '' : ` = ${JSON.stringify(change.newValue)}`
+      lines.push(`  ${change.op} ${change.path}${value}`)
+    }
+  }
+  if (action.verification) {
+    lines.push(
+      `Verification: ${action.verification.passed ? 'passed' : 'failed'} (${action.verification.command})`,
+    )
+  }
+  if (action.error) {
+    lines.push(`Error:        [${action.error.code}] ${action.error.message}`)
+  }
+  if (view.attempts.length > 0) {
+    lines.push(`Attempts:     ${view.attempts.map((a) => `${a.attempt}:${a.status}`).join(', ')}`)
+  }
+  if (view.job) {
+    lines.push(`Job:          ${view.job.id} (${view.job.status})`)
+  }
+  if (view.evidence.length > 0) {
+    lines.push(`Evidence:     ${view.evidence.map((e) => `${e.id}:${e.status}`).join(', ')}`)
+  }
+  return lines.join('\n')
 }

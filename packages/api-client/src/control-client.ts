@@ -15,6 +15,9 @@ import { BaseApiClient, type RequestOptions } from './base-client.js'
 import type { ApiClientOptions } from './options.js'
 import { routes } from './routes.js'
 import {
+  AliasActionViewSchema,
+  AliasPlanRequestSchema,
+  AliasProvisionRequestSchema,
   AuditRecordListSchema,
   HealthResponseSchema,
   LoginRequestSchema,
@@ -22,6 +25,9 @@ import {
   NavinEventSchema,
   SetupSessionCreateRequestSchema,
   SetupSessionListSchema,
+  type AliasActionView,
+  type AliasPlanRequest,
+  type AliasProvisionRequest,
   type HealthResponse,
   type LoginRequest,
   type LoginResponse,
@@ -162,6 +168,52 @@ export class ControlApiClient extends BaseApiClient {
       method: 'GET',
       path: routes.control.evidence(evidenceId),
       responseSchema: EvidenceRecordSchema,
+      ...options,
+    })
+  }
+
+  /** Tier 1 organization action: plan + diff only, no engine mutation. */
+  planAlias(request: AliasPlanRequest, options?: RequestOptions): Promise<AliasActionView> {
+    return this.send({
+      method: 'POST',
+      path: routes.control.organization.planAlias,
+      body: request,
+      requestSchema: AliasPlanRequestSchema,
+      responseSchema: AliasActionViewSchema,
+      ...options,
+    })
+  }
+
+  /** Tier 1 organization action: plan → approve → apply → verify → result. */
+  provisionAlias(
+    request: AliasProvisionRequest,
+    options?: RequestOptions,
+  ): Promise<AliasActionView> {
+    return this.send({
+      method: 'POST',
+      path: routes.control.organization.aliases,
+      body: request,
+      requestSchema: AliasProvisionRequestSchema,
+      responseSchema: AliasActionViewSchema,
+      ...(request.idempotencyKey === undefined ? {} : { idempotencyKey: request.idempotencyKey }),
+      ...options,
+    })
+  }
+
+  getAliasAction(actionId: string, options?: RequestOptions): Promise<AliasActionView> {
+    return this.send({
+      method: 'GET',
+      path: routes.control.organization.aliasAction(actionId),
+      responseSchema: AliasActionViewSchema,
+      ...options,
+    })
+  }
+
+  rollbackAlias(actionId: string, options?: RequestOptions): Promise<AliasActionView> {
+    return this.send({
+      method: 'POST',
+      path: routes.control.organization.rollbackAlias(actionId),
+      responseSchema: AliasActionViewSchema,
       ...options,
     })
   }

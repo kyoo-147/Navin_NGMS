@@ -14,6 +14,9 @@ import { MailService } from '../mail/service.js'
 import type { MailAccountBinding } from '../mail/credentials.js'
 import type { MailConfig } from '../config/schema.js'
 import { SetupService } from '@navin/setup-core'
+import { ActionCore } from '@navin/action-core'
+import { OrganizationService } from '@navin/organization-core'
+import { buildEngineAdapter } from '../organization/engine.js'
 import type { Database } from '../ports/database.js'
 import type { Container } from './container.js'
 
@@ -40,6 +43,7 @@ export class NavinKernel {
   private readonly container: Container
   private server: FastifyInstance | undefined
   private database: Database | undefined
+  private core: ActionCore | undefined
   private auth: ControlAuthorization | undefined
   private mail: MailService | undefined
   private started = false
@@ -104,6 +108,33 @@ export class NavinKernel {
       )
       this.auth = auth
 
+      // The action ledger runs its own migrations on its own SQLite file so its
+      // `schema_migrations` table never collides with the kernel migrator.
+      const actionDatabasePath =
+        config.databasePath === ':memory:' ? ':memory:' : `${config.databasePath}.actions`
+      const core = ActionCore.open({ path: actionDatabasePath, clock: () => clock.now() })
+      this.core = core
+
+      const recoveredActions = core.actionService.recoverInterrupted()
+      const recoveredJobs = core.jobRunner.recoverInterrupted()
+      if (recoveredActions.length > 0 || recoveredJobs.length > 0) {
+        logger.warn('recovered interrupted action work', {
+          actions: recoveredActions.length,
+          jobs: recoveredJobs.length,
+        })
+      }
+
+      const engine = buildEngineAdapter(config.engine)
+      logger.info('organization engine binding', {
+        configured: engine !== null,
+        engine: engine?.descriptor.engineId ?? null,
+      })
+      const organization = new OrganizationService({
+        core,
+        engine,
+        clock: () => clock.now(),
+      })
+
       const mailAccount = mailAccountFromConfig(config.mail)
       const mail = new MailService({
         databasePath: config.databasePath,
@@ -130,6 +161,7 @@ export class NavinKernel {
         startedAt,
         setup,
         auth,
+        organization,
         mail,
         mailAuth,
       })
@@ -196,6 +228,16 @@ export class NavinKernel {
         logger.error('failed to close auth store', { err: error })
       }
       this.auth = undefined
+    }
+
+    const core = this.core
+    this.core = undefined
+    if (core) {
+      try {
+        core.close()
+      } catch (error) {
+        logger.error('failed to close action ledger', { err: error })
+      }
     }
 
     const database = this.database

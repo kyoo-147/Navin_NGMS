@@ -1,4 +1,5 @@
 import { NavinCliClient } from './client.js'
+import { handleAliasCommand } from './commands/alias.js'
 import { handleAuthCommand } from './commands/auth.js'
 import { handleSetupCommand } from './commands/setup.js'
 import { handleStatusCommand } from './commands/status.js'
@@ -14,6 +15,8 @@ export interface ParsedArgs {
     token?: string
     title?: string
     target?: string
+    address?: string
+    idempotencyKey?: string
     destructive?: boolean
     confirm?: string
     yes?: boolean
@@ -48,6 +51,10 @@ export function parseArgs(rawArgs: string[]): ParsedArgs {
       flags.title = rawArgs[++i]
     } else if (arg === '--target' && i + 1 < rawArgs.length) {
       flags.target = rawArgs[++i]
+    } else if (arg === '--address' && i + 1 < rawArgs.length) {
+      flags.address = rawArgs[++i]
+    } else if (arg === '--idempotency-key' && i + 1 < rawArgs.length) {
+      flags.idempotencyKey = rawArgs[++i]
     } else if (arg === '--confirm' && i + 1 < rawArgs.length) {
       flags.confirm = rawArgs[++i]
     } else if (arg === '--cursor' && i + 1 < rawArgs.length) {
@@ -116,13 +123,21 @@ Usage:
   navin setup verify <sessionId>              Verify applied state
   navin setup evidence <sessionId> [id]       Inspect evidence
   navin setup events <sessionId>              Listen to SSE events
+  navin alias plan --address <a> --target <t> Plan a reversible alias (no mutation)
+  navin alias create --address <a> --target <t> [--yes] [--idempotency-key <k>]
+                                              Provision the alias (Tier 1, requires --yes)
+  navin alias status <actionId>               Show action, attempts, job and evidence
+  navin alias rollback <actionId>             Remove the alias this action created
 
 Options:
   --json           Output raw JSON
   --url <url>      Override navind URL (default: http://127.0.0.1:3000)
   --token <token>  Override session bearer token
+  --address <a>    Alias address for organization alias actions
+  --target <t>     Alias destination address
+  --idempotency-key <k>  Stable key so a retry resumes instead of duplicating
   --confirm <str>  Typed confirmation for Tier 3 operations
-  --yes            Skip ordinary prompts (never bypasses Tier 3)
+  --yes            Confirm a Tier 1 reversible mutation (never bypasses Tier 3)
 `
     return { output: help.trim(), exitCode: 0 }
   }
@@ -141,6 +156,8 @@ Options:
         return await handleAuthCommand(client, parsed.action, parsed.args, parsed.flags)
       case 'setup':
         return await handleSetupCommand(client, parsed.action, parsed.args, parsed.flags)
+      case 'alias':
+        return await handleAliasCommand(client, parsed.action, parsed.args, parsed.flags)
       default:
         return {
           output: `Unknown command "${parsed.namespace}". Run "navin --help" for usage.`,

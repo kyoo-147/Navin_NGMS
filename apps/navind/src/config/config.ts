@@ -1,7 +1,7 @@
 import { join } from 'node:path'
 import { TypeCompiler } from '@sinclair/typebox/compiler'
 import { REDACTED } from '../logging/redact.js'
-import { ConfigSchema, type AppConfig, type MailConfig } from './schema.js'
+import { ConfigSchema, type AppConfig, type EngineConfig, type MailConfig } from './schema.js'
 
 const compiledConfig = TypeCompiler.Compile(ConfigSchema)
 
@@ -79,6 +79,62 @@ function readMailConfig(env: NodeJS.ProcessEnv): MailConfig {
   }
 }
 
+function readEngineConfig(env: NodeJS.ProcessEnv, issues: ConfigIssue[]): EngineConfig {
+  return {
+    endpoint: env.NAVIN_ENGINE_ENDPOINT?.trim() || null,
+    token: env.NAVIN_ENGINE_TOKEN?.trim() || null,
+    username: env.NAVIN_ENGINE_USERNAME?.trim() || null,
+    password: env.NAVIN_ENGINE_PASSWORD?.trim() || null,
+    allowInsecureHttp: readBoolean(env, 'NAVIN_ENGINE_ALLOW_INSECURE_HTTP', false, issues),
+  }
+}
+
+/**
+ * Rejects every partial or ambiguous engine binding so a mutation can never be
+ * attempted against a half-configured engine. Valid states are: every value
+ * null (engine disabled), or an endpoint with exactly one auth method — a
+ * bearer token, or a username and password together.
+ */
+function validateEngineBinding(engine: EngineConfig, issues: ConfigIssue[]): void {
+  const { endpoint, token, username, password } = engine
+  const hasCredential = token !== null || username !== null || password !== null
+
+  if (endpoint === null) {
+    if (hasCredential) {
+      issues.push({
+        path: 'NAVIN_ENGINE_*',
+        message: 'engine credentials require NAVIN_ENGINE_ENDPOINT',
+      })
+    }
+    return
+  }
+
+  const hasToken = token !== null
+  const hasUsername = username !== null
+  const hasPassword = password !== null
+
+  if (!hasToken && !hasUsername && !hasPassword) {
+    issues.push({
+      path: 'NAVIN_ENGINE_*',
+      message: 'engine endpoint requires exactly one auth method: a token, or a username and password',
+    })
+    return
+  }
+  if (hasToken && (hasUsername || hasPassword)) {
+    issues.push({
+      path: 'NAVIN_ENGINE_*',
+      message: 'engine must use either a bearer token or username/password, not both',
+    })
+    return
+  }
+  if (hasUsername !== hasPassword) {
+    issues.push({
+      path: 'NAVIN_ENGINE_*',
+      message: 'engine basic auth requires both NAVIN_ENGINE_USERNAME and NAVIN_ENGINE_PASSWORD',
+    })
+  }
+}
+
 function deepFreeze<T>(value: T): T {
   if (value !== null && typeof value === 'object' && !Object.isFrozen(value)) {
     Object.freeze(value)
@@ -120,6 +176,7 @@ export function loadConfig(options: LoadConfigOptions = {}): AppConfig {
       encryptionKey: env.NAVIN_ENCRYPTION_KEY?.trim() || '',
     },
     mail: readMailConfig(env),
+    engine: readEngineConfig(env, issues),
     ...options.overrides,
   }
 
@@ -170,6 +227,8 @@ export function loadConfig(options: LoadConfigOptions = {}): AppConfig {
     })
   }
 
+  validateEngineBinding(candidate.engine, issues)
+
   if (issues.length > 0) {
     throw new ConfigValidationError(issues)
   }
@@ -188,6 +247,11 @@ export function redactConfig(config: AppConfig): AppConfig {
     mail: {
       ...config.mail,
       jmapAuthorization: config.mail.jmapAuthorization === null ? null : REDACTED,
+    },
+    engine: {
+      ...config.engine,
+      token: config.engine.token === null ? null : REDACTED,
+      password: config.engine.password === null ? null : REDACTED,
     },
   })
 }

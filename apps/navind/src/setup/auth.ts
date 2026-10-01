@@ -8,6 +8,8 @@ import {
   SystemRandom,
   createControlIssuer,
   createMailIssuer,
+  isNavinRole,
+  type NavinRole,
   type SessionRecord,
 } from '@navin/auth'
 import type { Clock } from '../ports/clock.js'
@@ -59,6 +61,15 @@ export class ControlAuthorization {
   }
 
   authenticate(request: FastifyRequest, requiredScope: string): SessionRecord {
+    return this.authenticateAll(request, [requiredScope])
+  }
+
+  /**
+   * Validates the session and requires *every* listed scope. Used where one
+   * mutation needs more than one authority (for example apply + approve), so a
+   * caller that holds only one of them is rejected before any work begins.
+   */
+  authenticateAll(request: FastifyRequest, requiredScopes: readonly string[]): SessionRecord {
     const token = bearerToken(request.headers.authorization)
     if (!token) throw new AuthError('INVALID_TOKEN')
     const surface = request.headers['x-navin-surface']
@@ -69,7 +80,7 @@ export class ControlAuthorization {
     this.service.assertAuthorized(session, {
       relyingParty: 'navin-control',
       surfaces: [surface],
-      allOf: [requiredScope],
+      allOf: [...requiredScopes],
     })
     return session
   }
@@ -82,13 +93,30 @@ export class ControlAuthorization {
     const email = env.NAVIN_CONTROL_BOOTSTRAP_EMAIL?.trim()
     const password = env.NAVIN_CONTROL_BOOTSTRAP_PASSWORD
     if (!email || !password || this.store.getUserByEmail(email)) return
+    const role = bootstrapRole(env)
     this.service.createUser({
       email,
       password,
-      roles: ['ops.super_admin'],
+      roles: [role],
       displayName: 'Alice',
     })
   }
+}
+
+/**
+ * Bootstrap role, defaulting to the full administrator. A least-privilege role
+ * (for example `ops.operator`) can be selected for disposable acceptance so the
+ * separation of apply and approve authority is exercisable in a real process.
+ */
+export function bootstrapRole(env: NodeJS.ProcessEnv): NavinRole {
+  const raw = env.NAVIN_CONTROL_BOOTSTRAP_ROLE?.trim()
+  if (raw === undefined || raw.length === 0) {
+    return 'ops.super_admin'
+  }
+  if (!isNavinRole(raw)) {
+    throw new Error(`NAVIN_CONTROL_BOOTSTRAP_ROLE is not a known Navin role: ${raw}`)
+  }
+  return raw
 }
 
 function bearerToken(value: string | string[] | undefined): string | undefined {

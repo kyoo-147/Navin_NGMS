@@ -36,6 +36,13 @@ export const routes = {
     cancelJob: (jobId: string) => `/control/jobs/${segment(jobId)}/cancel`,
     audit: '/control/audit',
     evidence: (evidenceId: string) => `/control/evidence/${segment(evidenceId)}`,
+    organization: {
+      planAlias: '/control/organization/aliases/plan',
+      aliases: '/control/organization/aliases',
+      aliasAction: (actionId: string) => `/control/organization/actions/${segment(actionId)}`,
+      rollbackAlias: (actionId: string) =>
+        `/control/organization/actions/${segment(actionId)}/rollback`,
+    },
   },
   events: '/events',
 } as const

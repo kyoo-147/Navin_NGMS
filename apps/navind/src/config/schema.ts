@@ -59,6 +59,26 @@ export const MailConfigSchema = Type.Object(
   { additionalProperties: false },
 )
 
+/**
+ * Server-side mail-engine (Stalwart admin API) binding.
+ *
+ * `endpoint` plus either `token` or `username`/`password` fully configures the
+ * engine; any other combination leaves the engine unconfigured, in which case
+ * organization actions fail closed with a typed `SERVICE_UNAVAILABLE` instead
+ * of falling back to an in-memory success. Credentials are secrets and are
+ * redacted from logs and redacted configuration.
+ */
+export const EngineConfigSchema = Type.Object(
+  {
+    endpoint: Type.Union([Type.String({ minLength: 1 }), Type.Null()]),
+    token: Type.Union([Type.String({ minLength: 1 }), Type.Null()]),
+    username: Type.Union([Type.String({ minLength: 1 }), Type.Null()]),
+    password: Type.Union([Type.String({ minLength: 1 }), Type.Null()]),
+    allowInsecureHttp: Type.Boolean(),
+  },
+  { additionalProperties: false },
+)
+
 export const ConfigSchema = Type.Object(
   {
     environment: EnvironmentSchema,
@@ -72,6 +92,7 @@ export const ConfigSchema = Type.Object(
     bodyLimitBytes: Type.Integer({ minimum: 1024, maximum: 104857600 }),
     secrets: SecretsSchema,
     mail: MailConfigSchema,
+    engine: EngineConfigSchema,
   },
   { additionalProperties: false },
 )
@@ -80,10 +101,17 @@ export type AppConfig = Static<typeof ConfigSchema>
 export type AppEnvironment = Static<typeof EnvironmentSchema>
 export type SecretConfig = Static<typeof SecretsSchema>
 export type MailConfig = Static<typeof MailConfigSchema>
+export type EngineConfig = Static<typeof EngineConfigSchema>
 
 /** True only when the upstream mail binding is complete. */
 export function isMailConfigured(mail: MailConfig): boolean {
   return (
     mail.jmapSessionUrl !== null && mail.jmapAuthorization !== null && mail.accountEmail !== null
   )
+}
+
+/** True only when endpoint and a usable credential pair are present. */
+export function isEngineConfigured(engine: EngineConfig): boolean {
+  if (engine.endpoint === null) return false
+  return engine.token !== null || (engine.username !== null && engine.password !== null)
 }

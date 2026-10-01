@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "rootDir": "..",
+    "paths": {
+      "@navin/contracts": ["../contracts/src/index.ts"],
+      "@navin/contracts/*": ["../contracts/src/*"],
+      "@navin/action-core": ["../action-core/src/index.ts"],
+      "@navin/engine-core": ["../engine-core/src/index.ts"],
+      "@navin/engine-core/testing": ["../engine-core/src/testing/index.ts"]
+    }
+  },
+  "include": ["src/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
+}

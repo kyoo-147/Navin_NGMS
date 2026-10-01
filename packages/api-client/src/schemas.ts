@@ -1,9 +1,15 @@
 import { Type, type Static } from '@sinclair/typebox'
 import {
+  ActionExecutionSchema,
+  ApprovalRequestSchema,
   AuditRecordSchema,
   BackgroundEventSchema,
+  EvidenceRecordSchema,
+  IdSchema,
+  IdempotencyKeySchema,
   IntelligenceModeSchema,
   IsoTimestampSchema,
+  JobSchema,
   NavinRelyingPartySchema,
   SessionPrincipalSchema,
   SetupEventSchema,
@@ -79,3 +85,71 @@ export type AuditRecordList = Static<typeof AuditRecordListSchema>
 /** Union of the two envelope event shapes the daemon streams over SSE. */
 export const NavinEventSchema = Type.Union([SetupEventSchema, BackgroundEventSchema])
 export type NavinEvent = Static<typeof NavinEventSchema>
+
+const EMAIL_ADDRESS_SCHEMA = Type.String({
+  minLength: 3,
+  maxLength: 320,
+  pattern: '^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$',
+})
+
+export const ActionAttemptStatusSchema = Type.Union([
+  Type.Literal('reserved'),
+  Type.Literal('dispatched'),
+  Type.Literal('succeeded'),
+  Type.Literal('failed'),
+  Type.Literal('unknown'),
+  Type.Literal('aborted'),
+])
+
+export const ActionAttemptSchema = Type.Object(
+  {
+    id: IdSchema,
+    actionId: IdSchema,
+    attempt: Type.Integer({ minimum: 1 }),
+    idempotencyKey: Type.Optional(IdempotencyKeySchema),
+    externalIdempotencyKey: Type.String({ minLength: 1 }),
+    status: ActionAttemptStatusSchema,
+    startedAt: IsoTimestampSchema,
+    dispatchedAt: Type.Optional(IsoTimestampSchema),
+    finishedAt: Type.Optional(IsoTimestampSchema),
+    detail: Type.Optional(Type.String()),
+  },
+  { additionalProperties: false },
+)
+export type ActionAttempt = Static<typeof ActionAttemptSchema>
+
+export const AliasPlanRequestSchema = Type.Object(
+  {
+    address: EMAIL_ADDRESS_SCHEMA,
+    target: EMAIL_ADDRESS_SCHEMA,
+    description: Type.Optional(Type.String({ maxLength: 256 })),
+    idempotencyKey: Type.Optional(IdempotencyKeySchema),
+  },
+  { additionalProperties: false },
+)
+export type AliasPlanRequest = Static<typeof AliasPlanRequestSchema>
+
+export const AliasProvisionRequestSchema = Type.Object(
+  {
+    address: EMAIL_ADDRESS_SCHEMA,
+    target: EMAIL_ADDRESS_SCHEMA,
+    description: Type.Optional(Type.String({ maxLength: 256 })),
+    confirm: Type.Boolean({ description: 'Tier 1 confirmation; false fails closed' }),
+    idempotencyKey: Type.Optional(IdempotencyKeySchema),
+  },
+  { additionalProperties: false },
+)
+export type AliasProvisionRequest = Static<typeof AliasProvisionRequestSchema>
+
+/** Identical view returned by plan, create, status and rollback. */
+export const AliasActionViewSchema = Type.Object(
+  {
+    action: ActionExecutionSchema,
+    approval: Type.Optional(ApprovalRequestSchema),
+    attempts: Type.Array(ActionAttemptSchema),
+    job: Type.Optional(JobSchema),
+    evidence: Type.Array(EvidenceRecordSchema),
+  },
+  { additionalProperties: false },
+)
+export type AliasActionView = Static<typeof AliasActionViewSchema>

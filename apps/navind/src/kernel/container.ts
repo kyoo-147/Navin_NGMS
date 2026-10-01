@@ -45,6 +45,8 @@ export function createContainer(
       config.secrets.sessionSecret,
       config.secrets.encryptionKey,
       ...(config.mail.jmapAuthorization ? [config.mail.jmapAuthorization] : []),
+      ...(config.engine.token ? [config.engine.token] : []),
+      ...(config.engine.password ? [config.engine.password] : []),
     ],
     base: {
       service: SERVICE_NAME,

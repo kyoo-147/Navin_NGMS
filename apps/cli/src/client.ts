@@ -1,6 +1,28 @@
-import type { SetupSession, SetupEvent } from '@navin/contracts'
+import type {
+  ActionExecution,
+  ApprovalRequest,
+  EvidenceRecord,
+  Job,
+  SetupSession,
+  SetupEvent,
+} from '@navin/contracts'
 import type { CliConfig } from './config.js'
 import { assertSafeApiUrlForToken } from './url-validator.js'
+
+export interface AliasActionView {
+  action: ActionExecution
+  approval?: ApprovalRequest
+  attempts: { id: string; attempt: number; status: string; detail?: string }[]
+  job?: Job
+  evidence: EvidenceRecord[]
+}
+
+export interface AliasInput {
+  address: string
+  target: string
+  description?: string
+  idempotencyKey?: string
+}
 
 export interface ClientErrorResponse {
   error: {
@@ -134,6 +156,35 @@ export class NavinCliClient {
       method: 'POST',
       body: JSON.stringify(options),
     })
+  }
+
+  async planAlias(input: AliasInput): Promise<AliasActionView> {
+    return this.request('/api/v1/control/organization/aliases/plan', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    })
+  }
+
+  async createAlias(
+    input: AliasInput & { confirm: boolean },
+    idempotencyKey?: string,
+  ): Promise<AliasActionView> {
+    return this.request('/api/v1/control/organization/aliases', {
+      method: 'POST',
+      body: JSON.stringify(input),
+      ...(idempotencyKey === undefined ? {} : { headers: { 'idempotency-key': idempotencyKey } }),
+    })
+  }
+
+  async getAliasAction(actionId: string): Promise<AliasActionView> {
+    return this.request(`/api/v1/control/organization/actions/${encodeURIComponent(actionId)}`)
+  }
+
+  async rollbackAlias(actionId: string): Promise<AliasActionView> {
+    return this.request(
+      `/api/v1/control/organization/actions/${encodeURIComponent(actionId)}/rollback`,
+      { method: 'POST', body: JSON.stringify({}) },
+    )
   }
 
   async streamEvents(

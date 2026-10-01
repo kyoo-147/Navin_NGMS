@@ -219,3 +219,93 @@ describe('mail configuration', () => {
     expect(JSON.stringify(redacted)).not.toContain('Basic c2VjcmV0')
   })
 })
+
+describe('engine configuration', () => {
+  it('defaults to an unconfigured engine binding', () => {
+    const config = loadConfig({ env: {} })
+    expect(config.engine).toEqual({
+      endpoint: null,
+      token: null,
+      username: null,
+      password: null,
+      allowInsecureHttp: false,
+    })
+  })
+
+  it('threads an invalid insecure-http boolean into the reported issues', () => {
+    try {
+      loadConfig({ env: { NAVIN_ENGINE_ALLOW_INSECURE_HTTP: 'maybe' } })
+      expect.unreachable('expected loadConfig to throw')
+    } catch (error) {
+      expect(error).toBeInstanceOf(ConfigValidationError)
+      const issues = (error as ConfigValidationError).issues
+      expect(issues.some((issue) => issue.path === 'NAVIN_ENGINE_ALLOW_INSECURE_HTTP')).toBe(true)
+    }
+  })
+
+  it('rejects credentials without an endpoint', () => {
+    expect(() => loadConfig({ env: { NAVIN_ENGINE_TOKEN: 'engine-token' } })).toThrow(
+      ConfigValidationError,
+    )
+  })
+
+  it('rejects an endpoint without an auth method', () => {
+    expect(() => loadConfig({ env: { NAVIN_ENGINE_ENDPOINT: 'http://127.0.0.1:1' } })).toThrow(
+      ConfigValidationError,
+    )
+  })
+
+  it('rejects half-configured basic auth', () => {
+    expect(() =>
+      loadConfig({
+        env: { NAVIN_ENGINE_ENDPOINT: 'http://127.0.0.1:1', NAVIN_ENGINE_USERNAME: 'admin' },
+      }),
+    ).toThrow(ConfigValidationError)
+  })
+
+  it('rejects mixed bearer and basic credentials', () => {
+    expect(() =>
+      loadConfig({
+        env: {
+          NAVIN_ENGINE_ENDPOINT: 'http://127.0.0.1:1',
+          NAVIN_ENGINE_TOKEN: 'engine-token',
+          NAVIN_ENGINE_USERNAME: 'admin',
+          NAVIN_ENGINE_PASSWORD: 'engine-pass',
+        },
+      }),
+    ).toThrow(ConfigValidationError)
+  })
+
+  it('accepts a bearer-token binding and redacts the token', () => {
+    const config = loadConfig({
+      env: { NAVIN_ENGINE_ENDPOINT: 'http://127.0.0.1:1', NAVIN_ENGINE_TOKEN: 'engine-token' },
+    })
+    expect(config.engine.endpoint).toBe('http://127.0.0.1:1')
+    expect(config.engine.token).toBe('engine-token')
+
+    const redacted = redactConfig(config)
+    expect(redacted.engine.token).toBe(REDACTED)
+    expect(JSON.stringify(redacted)).not.toContain('engine-token')
+  })
+
+  it('accepts a complete basic-auth binding and redacts the password', () => {
+    const config = loadConfig({
+      env: {
+        NAVIN_ENGINE_ENDPOINT: 'http://127.0.0.1:1',
+        NAVIN_ENGINE_USERNAME: 'admin',
+        NAVIN_ENGINE_PASSWORD: 'engine-pass',
+      },
+    })
+    expect(config.engine.username).toBe('admin')
+    expect(config.engine.password).toBe('engine-pass')
+
+    const redacted = redactConfig(config)
+    expect(redacted.engine.password).toBe(REDACTED)
+    expect(JSON.stringify(redacted)).not.toContain('engine-pass')
+  })
+
+  it('accepts an explicit insecure-http opt-in', () => {
+    const config = loadConfig({ env: { NAVIN_ENGINE_ALLOW_INSECURE_HTTP: 'true' } })
+    expect(config.engine.allowInsecureHttp).toBe(true)
+  })
+})

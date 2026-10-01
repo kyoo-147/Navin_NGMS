@@ -4,8 +4,10 @@ import type { HealthRegistry } from '../ports/health.js'
 import { API_VERSION, SERVICE_NAME, SERVICE_VERSION } from '../version.js'
 import type { AppConfig } from '../config/schema.js'
 import type { SetupService } from '@navin/setup-core'
+import type { OrganizationService } from '@navin/organization-core'
 import { ControlAuthorization } from '../setup/auth.js'
 import { registerSetupRoutes } from '../setup/routes.js'
+import { registerOrganizationRoutes } from '../organization/routes.js'
 import type { MailAuthorization } from '../mail/auth.js'
 import type { MailService } from '../mail/service.js'
 import { registerMailRoutes } from '../mail/routes.js'
@@ -17,6 +19,7 @@ export interface RouteDependencies {
   startedAt: number
   setup?: SetupService
   auth?: ControlAuthorization
+  organization?: OrganizationService
   mail?: MailService
   mailAuth?: MailAuthorization
 }
@@ -64,6 +67,14 @@ export function registerRoutes(app: FastifyInstance, deps: RouteDependencies): v
 
   if (deps.setup && deps.auth) {
     registerSetupRoutes(app, { setup: deps.setup, auth: deps.auth, clock: deps.clock })
+  }
+
+  if (deps.organization && deps.auth) {
+    registerOrganizationRoutes(app, {
+      organization: deps.organization,
+      auth: deps.auth,
+      clock: deps.clock,
+    })
   }
 
   if (deps.mail && deps.mailAuth) {
