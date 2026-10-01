@@ -1,0 +1,45 @@
+{
+  "name": "@navin/protocol-compat",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Bounded IMAP/SMTP compatibility clients for the Navin platform",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./common": {
+      "types": "./dist/common/index.d.ts",
+      "import": "./dist/common/index.js",
+      "default": "./dist/common/index.js"
+    },
+    "./transport": {
+      "types": "./dist/transport/index.d.ts",
+      "import": "./dist/transport/index.js",
+      "default": "./dist/transport/index.js"
+    },
+    "./imap": {
+      "types": "./dist/imap/index.d.ts",
+      "import": "./dist/imap/index.js",
+      "default": "./dist/imap/index.js"
+    },
+    "./smtp": {
+      "types": "./dist/smtp/index.d.ts",
+      "import": "./dist/smtp/index.js",
+      "default": "./dist/smtp/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json"
+  }
+}
