@@ -12,6 +12,8 @@ import {
   registerRequestLogging,
 } from './plugins.js'
 import { registerRoutes } from './routes.js'
+import type { SetupService } from '@navin/setup-core'
+import type { ControlAuthorization } from '../setup/auth.js'
 
 export interface ServerDependencies {
   config: AppConfig
@@ -20,6 +22,8 @@ export interface ServerDependencies {
   ids: IdGenerator
   health: HealthRegistry
   startedAt: number
+  setup?: SetupService
+  auth?: ControlAuthorization
 }
 
 export function buildServer(deps: ServerDependencies): FastifyInstance {
@@ -42,6 +46,8 @@ export function buildServer(deps: ServerDependencies): FastifyInstance {
     clock: deps.clock,
     health: deps.health,
     startedAt: deps.startedAt,
+    setup: deps.setup,
+    auth: deps.auth,
   })
 
   return app

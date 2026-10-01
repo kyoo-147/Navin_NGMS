@@ -1,0 +1,33 @@
+{
+  "name": "@navin/setup-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Durable resumable Navin Control setup sessions",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@navin/contracts": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.4",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

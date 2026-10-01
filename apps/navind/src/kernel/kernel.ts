@@ -8,6 +8,8 @@ import { Migrator } from '../db/migrator.js'
 import { createDatabaseCheck, createMigrationsCheck } from '../health/checks.js'
 import { DefaultHealthRegistry } from '../health/registry.js'
 import { buildServer } from '../http/server.js'
+import { ControlAuthorization } from '../setup/auth.js'
+import { SetupService } from '@navin/setup-core'
 import type { Database } from '../ports/database.js'
 import type { Container } from './container.js'
 
@@ -34,6 +36,7 @@ export class NavinKernel {
   private readonly container: Container
   private server: FastifyInstance | undefined
   private database: Database | undefined
+  private auth: ControlAuthorization | undefined
   private started = false
   private stopPromise: Promise<void> | undefined
 
@@ -87,7 +90,16 @@ export class NavinKernel {
       health.register(createDatabaseCheck(database))
       health.register(createMigrationsCheck(migrator))
 
-      const server = buildServer({ config, clock, ids, logger, health, startedAt })
+      const setup = new SetupService(database, clock)
+      const auth = new ControlAuthorization(
+        database.path,
+        clock,
+        config.secrets.sessionSecret,
+        config.secrets.encryptionKey,
+      )
+      this.auth = auth
+
+      const server = buildServer({ config, clock, ids, logger, health, startedAt, setup, auth })
       this.server = server
       await server.listen({ host: config.host, port: config.port })
     } catch (error) {
@@ -133,6 +145,15 @@ export class NavinKernel {
       } catch (error) {
         logger.error('failed to close http server', { err: error })
       }
+    }
+
+    if (this.auth) {
+      try {
+        this.auth.close()
+      } catch (error) {
+        logger.error('failed to close auth store', { err: error })
+      }
+      this.auth = undefined
     }
 
     const database = this.database

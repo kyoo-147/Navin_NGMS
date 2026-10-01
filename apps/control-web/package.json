@@ -1,0 +1,26 @@
+{
+  "name": "@navin/control-web",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Navin Control Web: functional setup journey, active blocks, diff, approvals, and evidence shell",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@navin/api-client": "workspace:*",
+    "@navin/contracts": "workspace:*",
+    "@navin/ui-primitives": "workspace:*",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.4",
+    "@types/react": "19.1.8",
+    "@types/react-dom": "19.1.6",
+    "typescript": "5.9.3",
+    "vitest": "3.2.7"
+  }
+}

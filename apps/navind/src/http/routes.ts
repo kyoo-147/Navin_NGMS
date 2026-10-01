@@ -3,12 +3,17 @@ import type { Clock } from '../ports/clock.js'
 import type { HealthRegistry } from '../ports/health.js'
 import { API_VERSION, SERVICE_NAME, SERVICE_VERSION } from '../version.js'
 import type { AppConfig } from '../config/schema.js'
+import type { SetupService } from '@navin/setup-core'
+import { ControlAuthorization } from '../setup/auth.js'
+import { registerSetupRoutes } from '../setup/routes.js'
 
 export interface RouteDependencies {
   config: AppConfig
   clock: Clock
   health: HealthRegistry
   startedAt: number
+  setup?: SetupService
+  auth?: ControlAuthorization
 }
 
 export function registerRoutes(app: FastifyInstance, deps: RouteDependencies): void {
@@ -51,4 +56,8 @@ export function registerRoutes(app: FastifyInstance, deps: RouteDependencies): v
       correlationId: request.correlationId,
     }
   })
+
+  if (deps.setup && deps.auth) {
+    registerSetupRoutes(app, { setup: deps.setup, auth: deps.auth, clock: deps.clock })
+  }
 }
