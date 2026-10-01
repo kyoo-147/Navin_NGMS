@@ -129,6 +129,52 @@ importers:
         specifier: 3.2.7
         version: 3.2.7(@types/node@22.20.4)(jsdom@26.1.0)(tsx@4.23.15)
 
+  apps/mail-web:
+    dependencies:
+      '@navin/api-client':
+        specifier: workspace:*
+        version: link:../../packages/api-client
+      '@navin/contracts':
+        specifier: workspace:*
+        version: link:../../packages/contracts
+      '@navin/design-system':
+        specifier: workspace:*
+        version: link:../../packages/design-system
+      react:
+        specifier: ^19.1.0
+        version: 19.1.0
+      react-dom:
+        specifier: ^19.1.0
+        version: 19.1.0(react@19.1.0)
+    devDependencies:
+      '@navin/mail-gateway':
+        specifier: workspace:*
+        version: link:../../packages/mail-gateway
+      '@testing-library/react':
+        specifier: 16.3.0
+        version: 16.3.0(@testing-library/dom@10.4.0)(@types/react-dom@19.1.6(@types/react@19.1.8))(@types/react@19.1.8)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@types/node':
+        specifier: 22.20.4
+        version: 22.20.4
+      '@types/react':
+        specifier: 19.1.8
+        version: 19.1.8
+      '@types/react-dom':
+        specifier: 19.1.6
+        version: 19.1.6(@types/react@19.1.8)
+      jsdom:
+        specifier: 26.1.0
+        version: 26.1.0
+      typescript:
+        specifier: 5.9.3
+        version: 5.9.3
+      vite:
+        specifier: 7.3.6
+        version: 7.3.6(@types/node@22.20.4)(tsx@4.23.15)
+      vitest:
+        specifier: 3.2.7
+        version: 3.2.7(@types/node@22.20.4)(jsdom@26.1.0)(tsx@4.23.15)
+
   apps/navind:
     dependencies:
       '@navin/auth':
@@ -137,6 +183,9 @@ importers:
       '@navin/contracts':
         specifier: workspace:*
         version: link:../../packages/contracts
+      '@navin/mail-gateway':
+        specifier: workspace:*
+        version: link:../../packages/mail-gateway
       '@navin/setup-core':
         specifier: workspace:*
         version: link:../../packages/setup-core
