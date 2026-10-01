@@ -1,0 +1,25 @@
+{
+  "name": "@navin/auth",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production auth and session package: separate Mail/Control issuers and audiences, __Host cookies, local admin password hashing, login/session rotation/revocation, scoped RBAC, Tier 3 recent-auth, CSRF/origin defenses and injectable clock/random/store.",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json"
+  }
+}
