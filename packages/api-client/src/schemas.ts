@@ -153,3 +153,45 @@ export const AliasActionViewSchema = Type.Object(
   { additionalProperties: false },
 )
 export type AliasActionView = Static<typeof AliasActionViewSchema>
+
+const DOMAIN_NAME_SCHEMA = Type.String({
+  minLength: 3,
+  maxLength: 253,
+  pattern: '^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$',
+})
+
+export const DomainPlanRequestSchema = Type.Object(
+  {
+    name: DOMAIN_NAME_SCHEMA,
+    description: Type.Optional(Type.String({ maxLength: 256 })),
+    dkimSigning: Type.Optional(Type.Boolean()),
+    idempotencyKey: Type.Optional(IdempotencyKeySchema),
+  },
+  { additionalProperties: false },
+)
+export type DomainPlanRequest = Static<typeof DomainPlanRequestSchema>
+
+export const DomainProvisionRequestSchema = Type.Object(
+  {
+    name: DOMAIN_NAME_SCHEMA,
+    description: Type.Optional(Type.String({ maxLength: 256 })),
+    dkimSigning: Type.Optional(Type.Boolean()),
+    confirm: Type.Boolean({ description: 'Tier 1 confirmation; false fails closed' }),
+    idempotencyKey: Type.Optional(IdempotencyKeySchema),
+  },
+  { additionalProperties: false },
+)
+export type DomainProvisionRequest = Static<typeof DomainProvisionRequestSchema>
+
+/** Identical view returned by domain plan, create, status and rollback. */
+export const DomainActionViewSchema = Type.Object(
+  {
+    action: ActionExecutionSchema,
+    approval: Type.Optional(ApprovalRequestSchema),
+    attempts: Type.Array(ActionAttemptSchema),
+    job: Type.Optional(JobSchema),
+    evidence: Type.Array(EvidenceRecordSchema),
+  },
+  { additionalProperties: false },
+)
+export type DomainActionView = Static<typeof DomainActionViewSchema>

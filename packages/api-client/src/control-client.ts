@@ -19,6 +19,9 @@ import {
   AliasPlanRequestSchema,
   AliasProvisionRequestSchema,
   AuditRecordListSchema,
+  DomainActionViewSchema,
+  DomainPlanRequestSchema,
+  DomainProvisionRequestSchema,
   HealthResponseSchema,
   LoginRequestSchema,
   LoginResponseSchema,
@@ -28,6 +31,9 @@ import {
   type AliasActionView,
   type AliasPlanRequest,
   type AliasProvisionRequest,
+  type DomainActionView,
+  type DomainPlanRequest,
+  type DomainProvisionRequest,
   type HealthResponse,
   type LoginRequest,
   type LoginResponse,
@@ -214,6 +220,52 @@ export class ControlApiClient extends BaseApiClient {
       method: 'POST',
       path: routes.control.organization.rollbackAlias(actionId),
       responseSchema: AliasActionViewSchema,
+      ...options,
+    })
+  }
+
+  /** Tier 1 organization action: plan + exact diff only, no engine mutation. */
+  planDomain(request: DomainPlanRequest, options?: RequestOptions): Promise<DomainActionView> {
+    return this.send({
+      method: 'POST',
+      path: routes.control.organization.planDomain,
+      body: request,
+      requestSchema: DomainPlanRequestSchema,
+      responseSchema: DomainActionViewSchema,
+      ...options,
+    })
+  }
+
+  /** Tier 1 organization action: plan → approve → apply → verify → result. */
+  provisionDomain(
+    request: DomainProvisionRequest,
+    options?: RequestOptions,
+  ): Promise<DomainActionView> {
+    return this.send({
+      method: 'POST',
+      path: routes.control.organization.domains,
+      body: request,
+      requestSchema: DomainProvisionRequestSchema,
+      responseSchema: DomainActionViewSchema,
+      ...(request.idempotencyKey === undefined ? {} : { idempotencyKey: request.idempotencyKey }),
+      ...options,
+    })
+  }
+
+  getDomainAction(actionId: string, options?: RequestOptions): Promise<DomainActionView> {
+    return this.send({
+      method: 'GET',
+      path: routes.control.organization.domainAction(actionId),
+      responseSchema: DomainActionViewSchema,
+      ...options,
+    })
+  }
+
+  rollbackDomain(actionId: string, options?: RequestOptions): Promise<DomainActionView> {
+    return this.send({
+      method: 'POST',
+      path: routes.control.organization.rollbackDomain(actionId),
+      responseSchema: DomainActionViewSchema,
       ...options,
     })
   }

@@ -42,6 +42,12 @@ export const routes = {
       aliasAction: (actionId: string) => `/control/organization/actions/${segment(actionId)}`,
       rollbackAlias: (actionId: string) =>
         `/control/organization/actions/${segment(actionId)}/rollback`,
+      planDomain: '/control/organization/domains/plan',
+      domains: '/control/organization/domains',
+      domainAction: (actionId: string) =>
+        `/control/organization/domains/actions/${segment(actionId)}`,
+      rollbackDomain: (actionId: string) =>
+        `/control/organization/domains/actions/${segment(actionId)}/rollback`,
     },
   },
   events: '/events',

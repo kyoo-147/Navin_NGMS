@@ -1,6 +1,7 @@
 import { NavinCliClient } from './client.js'
 import { handleAliasCommand } from './commands/alias.js'
 import { handleAuthCommand } from './commands/auth.js'
+import { handleDomainCommand } from './commands/domain.js'
 import { handleSetupCommand } from './commands/setup.js'
 import { handleStatusCommand } from './commands/status.js'
 import { loadConfig } from './config.js'
@@ -16,6 +17,8 @@ export interface ParsedArgs {
     title?: string
     target?: string
     address?: string
+    name?: string
+    description?: string
     idempotencyKey?: string
     destructive?: boolean
     confirm?: string
@@ -53,6 +56,10 @@ export function parseArgs(rawArgs: string[]): ParsedArgs {
       flags.target = rawArgs[++i]
     } else if (arg === '--address' && i + 1 < rawArgs.length) {
       flags.address = rawArgs[++i]
+    } else if (arg === '--name' && i + 1 < rawArgs.length) {
+      flags.name = rawArgs[++i]
+    } else if (arg === '--description' && i + 1 < rawArgs.length) {
+      flags.description = rawArgs[++i]
     } else if (arg === '--idempotency-key' && i + 1 < rawArgs.length) {
       flags.idempotencyKey = rawArgs[++i]
     } else if (arg === '--confirm' && i + 1 < rawArgs.length) {
@@ -128,6 +135,11 @@ Usage:
                                               Provision the alias (Tier 1, requires --yes)
   navin alias status <actionId>               Show action, attempts, job and evidence
   navin alias rollback <actionId>             Remove the alias this action created
+  navin domain plan --name <domain>           Plan a reversible domain (no mutation)
+  navin domain create --name <domain> [--yes] [--idempotency-key <k>]
+                                              Provision the domain (Tier 1, requires --yes)
+  navin domain status <actionId>              Show action, attempts, job and evidence
+  navin domain rollback <actionId>            Remove the domain this action created
 
 Options:
   --json           Output raw JSON
@@ -135,6 +147,8 @@ Options:
   --token <token>  Override session bearer token
   --address <a>    Alias address for organization alias actions
   --target <t>     Alias destination address
+  --name <domain>  Domain name for organization domain actions
+  --description <d>  Optional resource description
   --idempotency-key <k>  Stable key so a retry resumes instead of duplicating
   --confirm <str>  Typed confirmation for Tier 3 operations
   --yes            Confirm a Tier 1 reversible mutation (never bypasses Tier 3)
@@ -158,6 +172,8 @@ Options:
         return await handleSetupCommand(client, parsed.action, parsed.args, parsed.flags)
       case 'alias':
         return await handleAliasCommand(client, parsed.action, parsed.args, parsed.flags)
+      case 'domain':
+        return await handleDomainCommand(client, parsed.action, parsed.args, parsed.flags)
       default:
         return {
           output: `Unknown command "${parsed.namespace}". Run "navin --help" for usage.`,

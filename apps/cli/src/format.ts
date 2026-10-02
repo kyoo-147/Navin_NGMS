@@ -75,6 +75,20 @@ export function formatDiffBlock(block: SetupBlock): string {
 }
 
 export function formatAliasActionView(view: AliasActionView): string {
+  const alias = `${parameterValue(view, 'address')} -> ${parameterValue(view, 'target')}`
+  return formatOrganizationActionView(view, `Alias:        ${alias}`)
+}
+
+export function formatDomainActionView(view: AliasActionView): string {
+  return formatOrganizationActionView(view, `Domain:       ${parameterValue(view, 'name')}`)
+}
+
+function parameterValue(view: AliasActionView, key: string): string {
+  const value = view.action.parameters[key]
+  return value === undefined ? '-' : String(value)
+}
+
+function formatOrganizationActionView(view: AliasActionView, resourceLine: string): string {
   const { action } = view
   const lines = [
     `Action:       ${action.id}`,
@@ -83,7 +97,7 @@ export function formatAliasActionView(view: AliasActionView): string {
     `Stage:        ${action.stage}`,
     `Risk:         Tier ${action.riskTier}`,
     `Rollbackable: ${action.canRollback ? 'yes' : 'no'}`,
-    `Alias:        ${String(action.parameters.address ?? '-')} -> ${String(action.parameters.target ?? '-')}`,
+    resourceLine,
   ]
   if (action.diff) {
     lines.push(`Diff:         ${action.diff.summary}`)

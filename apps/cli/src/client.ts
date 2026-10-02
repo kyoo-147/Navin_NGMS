@@ -24,6 +24,13 @@ export interface AliasInput {
   idempotencyKey?: string
 }
 
+export interface DomainInput {
+  name: string
+  description?: string
+  dkimSigning?: boolean
+  idempotencyKey?: string
+}
+
 export interface ClientErrorResponse {
   error: {
     code: string
@@ -183,6 +190,37 @@ export class NavinCliClient {
   async rollbackAlias(actionId: string): Promise<AliasActionView> {
     return this.request(
       `/api/v1/control/organization/actions/${encodeURIComponent(actionId)}/rollback`,
+      { method: 'POST', body: JSON.stringify({}) },
+    )
+  }
+
+  async planDomain(input: DomainInput): Promise<AliasActionView> {
+    return this.request('/api/v1/control/organization/domains/plan', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    })
+  }
+
+  async createDomain(
+    input: DomainInput & { confirm: boolean },
+    idempotencyKey?: string,
+  ): Promise<AliasActionView> {
+    return this.request('/api/v1/control/organization/domains', {
+      method: 'POST',
+      body: JSON.stringify(input),
+      ...(idempotencyKey === undefined ? {} : { headers: { 'idempotency-key': idempotencyKey } }),
+    })
+  }
+
+  async getDomainAction(actionId: string): Promise<AliasActionView> {
+    return this.request(
+      `/api/v1/control/organization/domains/actions/${encodeURIComponent(actionId)}`,
+    )
+  }
+
+  async rollbackDomain(actionId: string): Promise<AliasActionView> {
+    return this.request(
+      `/api/v1/control/organization/domains/actions/${encodeURIComponent(actionId)}/rollback`,
       { method: 'POST', body: JSON.stringify({}) },
     )
   }

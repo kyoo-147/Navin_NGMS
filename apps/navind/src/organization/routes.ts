@@ -89,6 +89,74 @@ export function registerOrganizationRoutes(
       return handleError(reply, deps.clock, error)
     }
   })
+
+  app.post(`${BASE}/domains/plan`, (request, reply) => {
+    try {
+      const session = deps.auth.authenticate(request, CONTROL_SCOPES.plan)
+      const body = (request.body ?? {}) as Body
+      return deps.organization
+        .planDomain(readDomainInput(body), {
+          requestedBy: session.userId,
+          ...(typeof body.idempotencyKey === 'string'
+            ? { idempotencyKey: body.idempotencyKey }
+            : {}),
+          actor: actorFor(session.userId, session.roles, session.surface),
+        })
+        .then((view) => reply.send(view))
+        .catch((error: unknown) => handleError(reply, deps.clock, error))
+    } catch (error) {
+      return handleError(reply, deps.clock, error)
+    }
+  })
+
+  app.post(`${BASE}/domains`, (request, reply) => {
+    try {
+      // A confirmed apply both applies and approves a Tier 1 mutation, so it
+      // requires both authorities. A caller holding only `control:apply` (for
+      // example `ops.operator`) is rejected before any engine work.
+      const session = deps.auth.authenticateAll(request, [
+        CONTROL_SCOPES.apply,
+        CONTROL_SCOPES.approve,
+      ])
+      const body = (request.body ?? {}) as Body
+      return deps.organization
+        .provisionDomain(readDomainInput(body), {
+          requestedBy: session.userId,
+          confirm: body.confirm === true,
+          ...(typeof body.idempotencyKey === 'string'
+            ? { idempotencyKey: body.idempotencyKey }
+            : {}),
+          actor: actorFor(session.userId, session.roles, session.surface),
+        })
+        .then((view) => reply.send(view))
+        .catch((error: unknown) => handleError(reply, deps.clock, error))
+    } catch (error) {
+      return handleError(reply, deps.clock, error)
+    }
+  })
+
+  app.get<{ Params: Params }>(`${BASE}/domains/actions/:actionId`, (request, reply) => {
+    try {
+      deps.auth.authenticate(request, CONTROL_SCOPES.discover)
+      return reply.send(deps.organization.getDomainAction(request.params.actionId ?? ''))
+    } catch (error) {
+      return handleError(reply, deps.clock, error)
+    }
+  })
+
+  app.post<{ Params: Params }>(`${BASE}/domains/actions/:actionId/rollback`, (request, reply) => {
+    try {
+      const session = deps.auth.authenticate(request, CONTROL_SCOPES.rollback)
+      return deps.organization
+        .rollbackDomain(request.params.actionId ?? '', {
+          actor: actorFor(session.userId, session.roles, session.surface),
+        })
+        .then((view) => reply.send(view))
+        .catch((error: unknown) => handleError(reply, deps.clock, error))
+    } catch (error) {
+      return handleError(reply, deps.clock, error)
+    }
+  })
 }
 
 function readAliasInput(body: Body): { address: string; target: string; description?: string } {
@@ -96,6 +164,18 @@ function readAliasInput(body: Body): { address: string; target: string; descript
     address: typeof body.address === 'string' ? body.address : '',
     target: typeof body.target === 'string' ? body.target : '',
     ...(typeof body.description === 'string' ? { description: body.description } : {}),
+  }
+}
+
+function readDomainInput(body: Body): {
+  name: string
+  description?: string
+  dkimSigning?: boolean
+} {
+  return {
+    name: typeof body.name === 'string' ? body.name : '',
+    ...(typeof body.description === 'string' ? { description: body.description } : {}),
+    ...(typeof body.dkimSigning === 'boolean' ? { dkimSigning: body.dkimSigning } : {}),
   }
 }
 
