@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import { runCli } from './cli.js'
+import { readPasswordLine } from './password-stdin.js'
 
 export * from './cli.js'
 export * from './client.js'
 export * from './config.js'
 export * from './format.js'
+export * from './password-stdin.js'
 
 if (
   import.meta.url === `file://${process.argv[1]}` ||
@@ -12,7 +14,9 @@ if (
   process.argv[1]?.endsWith('navin.js') ||
   process.argv[1]?.endsWith('index.js')
 ) {
-  const result = await runCli(process.argv.slice(2))
+  const result = await runCli(process.argv.slice(2), undefined, {
+    readPasswordFromStdin: () => readPasswordLine(process.stdin),
+  })
   if (result.output) {
     if (result.exitCode === 0) {
       console.log(result.output)

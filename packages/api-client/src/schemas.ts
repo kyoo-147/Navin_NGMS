@@ -195,3 +195,56 @@ export const DomainActionViewSchema = Type.Object(
   { additionalProperties: false },
 )
 export type DomainActionView = Static<typeof DomainActionViewSchema>
+
+/**
+ * Apply-time mailbox password. It is bounded but never trimmed; the request
+ * schema only asserts the length, and the value is never placed in a URL.
+ */
+export const MailboxPasswordSchema = Type.String({ minLength: 12, maxLength: 256 })
+
+export const MailboxPlanRequestSchema = Type.Object(
+  {
+    email: EMAIL_ADDRESS_SCHEMA,
+    description: Type.Optional(Type.String({ maxLength: 256 })),
+    idempotencyKey: Type.Optional(IdempotencyKeySchema),
+  },
+  { additionalProperties: false },
+)
+export type MailboxPlanRequest = Static<typeof MailboxPlanRequestSchema>
+
+export const MailboxProvisionRequestSchema = Type.Object(
+  {
+    email: EMAIL_ADDRESS_SCHEMA,
+    description: Type.Optional(Type.String({ maxLength: 256 })),
+    password: Type.Optional(MailboxPasswordSchema),
+    confirm: Type.Boolean({ description: 'Tier 1 confirmation; false fails closed' }),
+    idempotencyKey: Type.Optional(IdempotencyKeySchema),
+  },
+  { additionalProperties: false },
+)
+export type MailboxProvisionRequest = Static<typeof MailboxProvisionRequestSchema>
+
+/**
+ * Destructive rollback confirmation. It must equal the canonical mailbox
+ * address; there is deliberately no `yes`/`force` field that could bypass it.
+ */
+export const MailboxRollbackRequestSchema = Type.Object(
+  {
+    confirmation: Type.Optional(Type.String({ maxLength: 320 })),
+  },
+  { additionalProperties: false },
+)
+export type MailboxRollbackRequest = Static<typeof MailboxRollbackRequestSchema>
+
+/** Identical view returned by mailbox plan, create, status and rollback. */
+export const MailboxActionViewSchema = Type.Object(
+  {
+    action: ActionExecutionSchema,
+    approval: Type.Optional(ApprovalRequestSchema),
+    attempts: Type.Array(ActionAttemptSchema),
+    job: Type.Optional(JobSchema),
+    evidence: Type.Array(EvidenceRecordSchema),
+  },
+  { additionalProperties: false },
+)
+export type MailboxActionView = Static<typeof MailboxActionViewSchema>

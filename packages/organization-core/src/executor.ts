@@ -16,13 +16,15 @@ import type {
   EngineResourceKind,
   EngineRollbackResult,
   EngineVerifyResult,
+  MailboxSpec,
   MailEngineAdapter,
 } from '@navin/engine-core'
 
 import { validateAliasRequest, type ValidatedAliasRequest } from './alias.js'
 import { validateDomainRequest, type ValidatedDomainRequest } from './domain.js'
 import { OrganizationError, toOrganizationError } from './errors.js'
-import { ALIAS_ACTION_NAME, DOMAIN_ACTION_NAME } from './names.js'
+import { validateMailboxRequest, type ValidatedMailboxRequest } from './mailbox.js'
+import { ALIAS_ACTION_NAME, DOMAIN_ACTION_NAME, MAILBOX_ACTION_NAME } from './names.js'
 import type { OrganizationStore } from './store.js'
 
 export const ORGANIZATION_EXECUTOR_NAME = 'organization'
@@ -55,12 +57,31 @@ export interface ReversibleResourceDescriptor<Request, Spec> {
     step: EnginePlanStep,
     options: EngineCallOptions,
   ): Promise<void>
+  /**
+   * Optional apply-time secret fields merged into the engine mutation only.
+   *
+   * They are never part of the `EnginePlan`, diff, evidence, job or logs, and
+   * are only handed to `EngineApplyOptions.secrets` for this step id. Returning
+   * `undefined` means the step needs no secret; throwing fails the apply closed
+   * *before* any engine mutation.
+   */
+  secretFields?(
+    step: EnginePlanStep,
+    ctx: ExecutorContext,
+    getSecret: ((actionId: string) => string | undefined) | undefined,
+  ): Record<string, unknown> | undefined
 }
 
 export interface ReversibleExecutorDeps {
   engine: MailEngineAdapter | null
   store: OrganizationStore
   clock: Clock
+  /**
+   * Resolves a request-scoped secret for an action id. Absent/`undefined` means
+   * the caller did not hand a secret to this process, which is never a licence
+   * to mutate the engine without one.
+   */
+  secretProvider?: (actionId: string) => string | undefined
 }
 
 function readString(step: EnginePlanStep, key: string): string | undefined {
@@ -139,9 +160,18 @@ export class ReversibleCreateExecutor<Request, Spec> implements ActionExecutorPo
 
     let result: EngineApplyResult
     try {
+      // Secrets are resolved *before* the engine call, so a missing apply-time
+      // secret fails the step closed with zero mutation rather than half-applying
+      // a request that needs credentials.
+      const fields =
+        step === undefined
+          ? undefined
+          : this.descriptor.secretFields?.(step, ctx, this.deps.secretProvider)
+      const secrets = fields === undefined || step === undefined ? undefined : { [step.id]: fields }
       result = await engine.apply(record.enginePlan, {
         ...this.callOptions(ctx),
         ...(ctx.idempotencyKey === undefined ? {} : { idempotencyKey: ctx.idempotencyKey }),
+        ...(secrets === undefined ? {} : { secrets }),
       })
     } catch (error) {
       throw toOrganizationError(error, { needsAttention: true })
@@ -307,6 +337,17 @@ function readDomainRequest(parameters: Record<string, unknown>): ValidatedDomain
   })
 }
 
+function readMailboxRequest(parameters: Record<string, unknown>): ValidatedMailboxRequest {
+  const email = parameters.email
+  if (typeof email !== 'string') {
+    throw new OrganizationError('VALIDATION_FAILED', 'Mailbox action parameters are missing email')
+  }
+  return validateMailboxRequest({
+    email,
+    ...(typeof parameters.description === 'string' ? { description: parameters.description } : {}),
+  })
+}
+
 const ALIAS_DESCRIPTOR: ReversibleResourceDescriptor<ValidatedAliasRequest, AliasSpec> = {
   actionName: ALIAS_ACTION_NAME,
   kind: 'alias',
@@ -327,20 +368,19 @@ const ALIAS_DESCRIPTOR: ReversibleResourceDescriptor<ValidatedAliasRequest, Alia
 }
 
 /**
- * Refuses to destroy a domain that acquired dependent mailboxes or aliases
- * after it was created.
+ * Runs a fresh, complete dependency discovery for a rollback guard.
  *
- * Engine snapshot equality only covers the domain record, so a matching domain
- * snapshot can still have children that a delete would orphan. Discovery runs
- * fresh here; a discovery failure is never a licence to destroy, so it fails
- * closed with operator attention. Only safe counts and the domain id are
- * reported.
+ * `discover` is fail-soft: it returns empty arrays while recording warnings for
+ * resources it could not enumerate. A report with warnings cannot prove
+ * complete dependency enumeration, so it is never a licence to destroy; the
+ * guard fails closed with operator attention and surfaces only the warning
+ * count (raw warning text may contain endpoint details).
  */
-async function assertNoDependentChildren(
+async function assertDiscoveryClean(
   engine: MailEngineAdapter,
-  step: EnginePlanStep,
   options: EngineCallOptions,
-): Promise<void> {
+  kindLabel: string,
+): Promise<EngineDiscoveryReport> {
   let report: EngineDiscoveryReport
   try {
     report = await engine.discover(options)
@@ -348,18 +388,28 @@ async function assertNoDependentChildren(
     throw toOrganizationError(error, { needsAttention: true })
   }
 
-  // `discover` is fail-soft: it returns empty arrays while recording warnings
-  // for resources it could not enumerate. A report with warnings cannot prove
-  // complete dependency enumeration, so it is never a licence to destroy. Only
-  // the warning count is surfaced; raw warning text may contain endpoint
-  // details.
   if (report.warnings.length > 0) {
     throw new OrganizationError(
       'ACTION_BLOCKED',
-      'Refusing to roll back a domain: the engine reported warnings during dependency discovery',
+      `Refusing to roll back a ${kindLabel}: the engine reported warnings during dependency discovery`,
       { details: { needsAttention: true, warningCount: report.warnings.length } },
     )
   }
+  return report
+}
+
+/**
+ * Refuses to destroy a domain that acquired dependent mailboxes or aliases
+ * after it was created. Engine snapshot equality only covers the domain record,
+ * so a matching snapshot can still have children a delete would orphan; only
+ * safe counts and the domain id are reported.
+ */
+async function assertNoDependentChildren(
+  engine: MailEngineAdapter,
+  step: EnginePlanStep,
+  options: EngineCallOptions,
+): Promise<void> {
+  const report = await assertDiscoveryClean(engine, options, 'domain')
 
   const domain = report.domains.find((entry) => entry.name === step.target)
   if (domain === undefined) {
@@ -405,4 +455,67 @@ export function createAliasProvisioningExecutor(deps: ReversibleExecutorDeps): A
 
 export function createDomainProvisioningExecutor(deps: ReversibleExecutorDeps): ActionExecutorPort {
   return new ReversibleCreateExecutor(DOMAIN_DESCRIPTOR, deps)
+}
+
+/**
+ * Refuses to destroy a mailbox that is still the target of an alias.
+ *
+ * A delete would silently break mail delivery for that alias, so a destination
+ * that is referenced is never destroyed on a rollback. Discovery runs fresh and
+ * must be complete (no warnings) or the rollback fails closed; only a safe
+ * count is reported.
+ */
+async function assertNoAliasesTargetMailbox(
+  engine: MailEngineAdapter,
+  step: EnginePlanStep,
+  options: EngineCallOptions,
+): Promise<void> {
+  const report = await assertDiscoveryClean(engine, options, 'mailbox')
+  const target = step.target.toLowerCase()
+  const aliasCount = report.aliases.filter((entry) => entry.target.toLowerCase() === target).length
+  if (aliasCount > 0) {
+    throw new OrganizationError(
+      'ACTION_BLOCKED',
+      'Refusing to roll back a mailbox that is still an alias destination',
+      { details: { mailbox: step.target, aliasCount, needsAttention: true } },
+    )
+  }
+}
+
+const MAILBOX_DESCRIPTOR: ReversibleResourceDescriptor<ValidatedMailboxRequest, MailboxSpec> = {
+  actionName: MAILBOX_ACTION_NAME,
+  kind: 'mailbox',
+  parseRequest: readMailboxRequest,
+  toSpec: (request) => ({
+    email: request.email,
+    ...(request.description === undefined ? {} : { description: request.description }),
+  }),
+  specFromStep: (step) => ({
+    email: step.target,
+    ...(readString(step, 'description') === undefined
+      ? {}
+      : { description: readString(step, 'description') as string }),
+  }),
+  plan: (engine, spec, options) => engine.planMailbox(spec, options),
+  secretFields: (step, ctx, getSecret) => {
+    if (step.op === 'noop') {
+      return undefined
+    }
+    const password = getSecret?.(ctx.actionId)
+    if (password === undefined) {
+      throw new OrganizationError(
+        'ACTION_BLOCKED',
+        'Mailbox password is required to apply this action and is not available',
+        { details: { needsAttention: true, secretRequired: true } },
+      )
+    }
+    return { credentials: { '0': { '@type': 'Password', secret: password } } }
+  },
+  guardRollback: assertNoAliasesTargetMailbox,
+}
+
+export function createMailboxProvisioningExecutor(
+  deps: ReversibleExecutorDeps,
+): ActionExecutorPort {
+  return new ReversibleCreateExecutor(MAILBOX_DESCRIPTOR, deps)
 }

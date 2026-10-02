@@ -31,6 +31,14 @@ export interface DomainInput {
   idempotencyKey?: string
 }
 
+export interface MailboxInput {
+  email: string
+  description?: string
+  /** Apply-time secret; sent in the request body only. */
+  password?: string
+  idempotencyKey?: string
+}
+
 export interface ClientErrorResponse {
   error: {
     code: string
@@ -222,6 +230,37 @@ export class NavinCliClient {
     return this.request(
       `/api/v1/control/organization/domains/actions/${encodeURIComponent(actionId)}/rollback`,
       { method: 'POST', body: JSON.stringify({}) },
+    )
+  }
+
+  async planMailbox(input: MailboxInput): Promise<AliasActionView> {
+    return this.request('/api/v1/control/organization/mailboxes/plan', {
+      method: 'POST',
+      body: JSON.stringify(input),
+    })
+  }
+
+  async createMailbox(
+    input: MailboxInput & { confirm: boolean },
+    idempotencyKey?: string,
+  ): Promise<AliasActionView> {
+    return this.request('/api/v1/control/organization/mailboxes', {
+      method: 'POST',
+      body: JSON.stringify(input),
+      ...(idempotencyKey === undefined ? {} : { headers: { 'idempotency-key': idempotencyKey } }),
+    })
+  }
+
+  async getMailboxAction(actionId: string): Promise<AliasActionView> {
+    return this.request(
+      `/api/v1/control/organization/mailboxes/actions/${encodeURIComponent(actionId)}`,
+    )
+  }
+
+  async rollbackMailbox(actionId: string, confirmation: string): Promise<AliasActionView> {
+    return this.request(
+      `/api/v1/control/organization/mailboxes/actions/${encodeURIComponent(actionId)}/rollback`,
+      { method: 'POST', body: JSON.stringify({ confirmation }) },
     )
   }
 

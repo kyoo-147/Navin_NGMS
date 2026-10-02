@@ -2,6 +2,7 @@ import { NavinCliClient } from './client.js'
 import { handleAliasCommand } from './commands/alias.js'
 import { handleAuthCommand } from './commands/auth.js'
 import { handleDomainCommand } from './commands/domain.js'
+import { handleMailboxCommand } from './commands/mailbox.js'
 import { handleSetupCommand } from './commands/setup.js'
 import { handleStatusCommand } from './commands/status.js'
 import { loadConfig } from './config.js'
@@ -18,6 +19,12 @@ export interface ParsedArgs {
     target?: string
     address?: string
     name?: string
+    email?: string
+    /** Resolved apply-time password (from --password-stdin), never from argv. */
+    password?: string
+    passwordStdin?: boolean
+    /** Set when the removed plaintext --password flag is used. */
+    plaintextPassword?: boolean
     description?: string
     idempotencyKey?: string
     destructive?: boolean
@@ -58,6 +65,16 @@ export function parseArgs(rawArgs: string[]): ParsedArgs {
       flags.address = rawArgs[++i]
     } else if (arg === '--name' && i + 1 < rawArgs.length) {
       flags.name = rawArgs[++i]
+    } else if (arg === '--email' && i + 1 < rawArgs.length) {
+      flags.email = rawArgs[++i]
+    } else if (arg === '--password-stdin') {
+      flags.passwordStdin = true
+    } else if (arg === '--password') {
+      // Plaintext secrets must never enter process argv or shell history. The
+      // value is skipped so it cannot be mistaken for a positional argument.
+      flags.plaintextPassword = true
+      const next = rawArgs[i + 1]
+      if (next !== undefined && !next.startsWith('--')) i++
     } else if (arg === '--description' && i + 1 < rawArgs.length) {
       flags.description = rawArgs[++i]
     } else if (arg === '--idempotency-key' && i + 1 < rawArgs.length) {
@@ -99,9 +116,19 @@ export function parseArgs(rawArgs: string[]): ParsedArgs {
   }
 }
 
+/**
+ * Explicit IO boundary. The executable entrypoint supplies the stdin reader;
+ * tests inject a deterministic one. It is never read unless `--password-stdin`
+ * is present, so a plain invocation can never block on stdin.
+ */
+export interface CliIo {
+  readPasswordFromStdin: () => Promise<string>
+}
+
 export async function runCli(
   rawArgs: string[],
   configOverrides?: { apiUrl?: string; token?: string },
+  io?: CliIo,
 ): Promise<{ output: string; exitCode: number }> {
   const parsed = parseArgs(rawArgs)
 
@@ -140,6 +167,13 @@ Usage:
                                               Provision the domain (Tier 1, requires --yes)
   navin domain status <actionId>              Show action, attempts, job and evidence
   navin domain rollback <actionId>            Remove the domain this action created
+  navin mailbox plan --email <address>        Plan a reversible mailbox (no mutation)
+  navin mailbox create --email <address> --password-stdin [--yes] [--idempotency-key <k>]
+                                              Provision the mailbox (Tier 1, requires --yes; reads the
+                                              password from stdin)
+  navin mailbox status <actionId>             Show action, attempts, job and evidence
+  navin mailbox rollback <actionId> --confirm <email>
+                                              Destroy the mailbox (Tier 3, recent step-up + typed email)
 
 Options:
   --json           Output raw JSON
@@ -148,12 +182,37 @@ Options:
   --address <a>    Alias address for organization alias actions
   --target <t>     Alias destination address
   --name <domain>  Domain name for organization domain actions
+  --email <address>  Mailbox address for organization mailbox actions
+  --password-stdin  Read the apply-time mailbox password from stdin (never argv)
   --description <d>  Optional resource description
   --idempotency-key <k>  Stable key so a retry resumes instead of duplicating
   --confirm <str>  Typed confirmation for Tier 3 operations
   --yes            Confirm a Tier 1 reversible mutation (never bypasses Tier 3)
 `
     return { output: help.trim(), exitCode: 0 }
+  }
+
+  if (parsed.flags.plaintextPassword) {
+    return {
+      output:
+        'Error: plaintext --password is not supported (it would leak the secret into shell history and process argv).\nPipe the secret via --password-stdin instead.',
+      exitCode: 1,
+    }
+  }
+
+  if (parsed.flags.passwordStdin) {
+    if (io === undefined) {
+      return {
+        output: 'Error: --password-stdin cannot be read in this context.',
+        exitCode: 1,
+      }
+    }
+    try {
+      parsed.flags.password = await io.readPasswordFromStdin()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error)
+      return { output: `Error: ${message}`, exitCode: 1 }
+    }
   }
 
   const config = loadConfig(
@@ -174,6 +233,8 @@ Options:
         return await handleAliasCommand(client, parsed.action, parsed.args, parsed.flags)
       case 'domain':
         return await handleDomainCommand(client, parsed.action, parsed.args, parsed.flags)
+      case 'mailbox':
+        return await handleMailboxCommand(client, parsed.action, parsed.args, parsed.flags)
       default:
         return {
           output: `Unknown command "${parsed.namespace}". Run "navin --help" for usage.`,

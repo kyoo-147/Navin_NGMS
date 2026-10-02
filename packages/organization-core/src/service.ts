@@ -1,5 +1,6 @@
 import {
   ActionCore,
+  ActionCoreError,
   type ActionAttempt,
   type Clock,
   type JobHandlerContext,
@@ -29,8 +30,27 @@ import {
   type ValidatedDomainRequest,
 } from './domain.js'
 import { OrganizationError } from './errors.js'
-import { createAliasProvisioningExecutor, createDomainProvisioningExecutor } from './executor.js'
-import { ALIAS_ACTION_NAME, ALIAS_JOB_NAME, DOMAIN_ACTION_NAME, DOMAIN_JOB_NAME } from './names.js'
+import {
+  createAliasProvisioningExecutor,
+  createDomainProvisioningExecutor,
+  createMailboxProvisioningExecutor,
+} from './executor.js'
+import {
+  derivedMailboxIdempotencyKey,
+  MailboxSecretBroker,
+  validateMailboxPassword,
+  validateMailboxRequest,
+  type MailboxProvisioningInput,
+  type ValidatedMailboxRequest,
+} from './mailbox.js'
+import {
+  ALIAS_ACTION_NAME,
+  ALIAS_JOB_NAME,
+  DOMAIN_ACTION_NAME,
+  DOMAIN_JOB_NAME,
+  MAILBOX_ACTION_NAME,
+  MAILBOX_JOB_NAME,
+} from './names.js'
 import { OrganizationStore } from './store.js'
 
 export interface OrganizationServiceDeps {
@@ -63,8 +83,19 @@ export interface OrganizationActionView {
   evidence: EvidenceRecord[]
 }
 
+export interface MailboxRollbackOptions {
+  actor?: AuditActor
+  /**
+   * Typed confirmation that must equal the canonical mailbox address. It is
+   * re-checked here in addition to the route's Tier-3 gate, so a mailbox can
+   * never be destroyed without the exact address.
+   */
+  typedConfirmation?: string
+}
+
 type AliasActionView = OrganizationActionView
 type DomainActionView = OrganizationActionView
+type MailboxActionView = OrganizationActionView
 
 interface ResourceFlow<Request> {
   actionName: string
@@ -75,6 +106,13 @@ interface ResourceFlow<Request> {
   keyOf(parameters: Record<string, unknown>): string | undefined
   parametersOf(request: Request): Record<string, unknown>
   derivedKey(request: Request): string
+  /**
+   * When true, every non-settled job invocation must hold an exclusive broker
+   * claim before running, including a claim that represents "no secret". This
+   * stops a concurrent duplicate from running the job under another request's
+   * claim.
+   */
+  usesSecretBroker?: boolean
 }
 
 const ALIAS_FLOW: ResourceFlow<ValidatedAliasRequest> = {
@@ -105,11 +143,26 @@ const DOMAIN_FLOW: ResourceFlow<ValidatedDomainRequest> = {
   derivedKey: derivedDomainIdempotencyKey,
 }
 
+const MAILBOX_FLOW: ResourceFlow<ValidatedMailboxRequest> = {
+  actionName: MAILBOX_ACTION_NAME,
+  jobName: MAILBOX_JOB_NAME,
+  kind: 'mailbox',
+  collector: 'organization-core:organization.mailbox',
+  keyOf: (parameters) => (typeof parameters.email === 'string' ? parameters.email : undefined),
+  parametersOf: (request) => ({
+    email: request.email,
+    ...(request.description === undefined ? {} : { description: request.description }),
+  }),
+  derivedKey: derivedMailboxIdempotencyKey,
+  usesSecretBroker: true,
+}
+
 /** Drives `apply` for a planned, approved resource action inside a durable job. */
 class ProvisionJobHandler implements JobHandlerPort {
   constructor(
     readonly name: string,
     private readonly core: ActionCore,
+    private readonly beforeApply?: (actionId: string) => void | Promise<void>,
   ) {}
 
   async run(job: Job, ctx: JobHandlerContext): Promise<Record<string, unknown>> {
@@ -123,6 +176,10 @@ class ProvisionJobHandler implements JobHandlerPort {
         },
       )
     }
+    // Fail closed before the durable dispatch fence when the action needs a
+    // secret this process does not hold: no attempt, no mutation, resumable.
+    // Reconciliation of an interrupted dispatch also runs here, before the fence.
+    await this.beforeApply?.(actionId)
     const applyKey = typeof job.payload.applyKey === 'string' ? job.payload.applyKey : undefined
     ctx.reportProgress({ current: 1, total: 2, percentage: 50, message: 'Applying mutation' })
     const action = await this.core.actionService.applyAction(actionId, {
@@ -155,6 +212,12 @@ class ProvisionJobHandler implements JobHandlerPort {
 export class OrganizationService {
   private readonly store: OrganizationStore
   private readonly surface: NavinSurface
+  /**
+   * Request-scoped apply-time secrets. A password lives here only while the
+   * request that supplied it is applying its action and is cleared in a
+   * `finally`; it is never persisted or serialized.
+   */
+  private readonly mailboxSecrets = new MailboxSecretBroker()
 
   constructor(private readonly deps: OrganizationServiceDeps) {
     this.surface = deps.surface ?? 'control'
@@ -165,6 +228,7 @@ export class OrganizationService {
       engine: deps.engine,
       store: this.store,
       clock: deps.clock,
+      secretProvider: (actionId: string) => this.mailboxSecrets.get(actionId),
     }
     if (deps.core.executors.findExecutor(ALIAS_ACTION_NAME) === undefined) {
       deps.core.executors.registerExecutor(createAliasProvisioningExecutor(executorDeps))
@@ -172,11 +236,21 @@ export class OrganizationService {
     if (deps.core.executors.findExecutor(DOMAIN_ACTION_NAME) === undefined) {
       deps.core.executors.registerExecutor(createDomainProvisioningExecutor(executorDeps))
     }
+    if (deps.core.executors.findExecutor(MAILBOX_ACTION_NAME) === undefined) {
+      deps.core.executors.registerExecutor(createMailboxProvisioningExecutor(executorDeps))
+    }
     if (deps.core.executors.findJobHandler(ALIAS_JOB_NAME) === undefined) {
       deps.core.executors.registerJobHandler(new ProvisionJobHandler(ALIAS_JOB_NAME, deps.core))
     }
     if (deps.core.executors.findJobHandler(DOMAIN_JOB_NAME) === undefined) {
       deps.core.executors.registerJobHandler(new ProvisionJobHandler(DOMAIN_JOB_NAME, deps.core))
+    }
+    if (deps.core.executors.findJobHandler(MAILBOX_JOB_NAME) === undefined) {
+      deps.core.executors.registerJobHandler(
+        new ProvisionJobHandler(MAILBOX_JOB_NAME, deps.core, (actionId) =>
+          this.prepareMailboxApply(actionId),
+        ),
+      )
     }
   }
 
@@ -248,10 +322,91 @@ export class OrganizationService {
     return this.rollback(DOMAIN_FLOW, actionId, options)
   }
 
+  /** plan → diff, persisted and awaiting approval. No engine mutation. */
+  async planMailbox(
+    input: MailboxProvisioningInput,
+    options: PlanActionOptions,
+  ): Promise<MailboxActionView> {
+    const request = validateMailboxRequest(input)
+    this.assertEngineConfigured()
+    const key = this.resolveKey(request, options.idempotencyKey, MAILBOX_FLOW.derivedKey)
+    return this.view(
+      MAILBOX_FLOW,
+      (await this.stageAndPlan(MAILBOX_FLOW, request, options, key)).id,
+    )
+  }
+
+  /**
+   * plan → diff → approve → apply → verify → result for a mailbox create.
+   *
+   * Create-only: a differing pre-existing mailbox is refused before mutation.
+   * The password is an apply-time secret and never reaches parameters, the
+   * idempotency payload, the job, the plan, evidence or logs; without it the
+   * action fails closed (needs_attention / secret required) with zero mutation
+   * and stays resumable by the same request and idempotency key.
+   */
+  provisionMailbox(
+    input: MailboxProvisioningInput,
+    options: ProvisionActionOptions,
+  ): Promise<MailboxActionView> {
+    const request = validateMailboxRequest(input)
+    const password =
+      input.password === undefined ? undefined : validateMailboxPassword(input.password)
+    return this.provision(MAILBOX_FLOW, request, options, password)
+  }
+
+  getMailboxAction(actionId: string): MailboxActionView {
+    return this.view(MAILBOX_FLOW, actionId)
+  }
+
+  /**
+   * Canonical mailbox address that a destructive rollback must echo back as its
+   * typed confirmation. Rejected for a foreign action id.
+   */
+  mailboxRollbackTarget(actionId: string): string {
+    const action = this.requireAction(MAILBOX_FLOW, actionId)
+    const email = MAILBOX_FLOW.keyOf(action.parameters)
+    if (email === undefined) {
+      throw new OrganizationError('INTERNAL_ERROR', 'Mailbox action has no target address', {
+        details: { actionId },
+      })
+    }
+    return email
+  }
+
+  /**
+   * Destructive rollback: destroys exactly the mailbox this action created and
+   * proves absence. The typed confirmation must equal the canonical address;
+   * the Tier-3 recent-auth gate is enforced by the control surface.
+   */
+  async rollbackMailbox(
+    actionId: string,
+    options: MailboxRollbackOptions = {},
+  ): Promise<MailboxActionView> {
+    const action = this.requireAction(MAILBOX_FLOW, actionId)
+    const email = MAILBOX_FLOW.keyOf(action.parameters)
+    if (email === undefined) {
+      throw new OrganizationError('INTERNAL_ERROR', 'Mailbox action has no target address', {
+        details: { actionId },
+      })
+    }
+    if (options.typedConfirmation === undefined || options.typedConfirmation !== email) {
+      throw new OrganizationError(
+        'APPROVAL_REQUIRED',
+        'Mailbox rollback requires the exact mailbox address as typed confirmation',
+        { details: { actionId, riskTier: 3 } },
+      )
+    }
+    return this.rollback(MAILBOX_FLOW, actionId, {
+      ...(options.actor === undefined ? {} : { actor: options.actor }),
+    })
+  }
+
   private async provision<Request>(
     flow: ResourceFlow<Request>,
     request: Request,
     options: ProvisionActionOptions,
+    secret?: string,
   ): Promise<OrganizationActionView> {
     if (options.confirm !== true) {
       throw new OrganizationError(
@@ -278,13 +433,76 @@ export class OrganizationService {
 
     const job = this.ensureJob(flow, action.id, request, key)
     if (job.status !== 'completed') {
-      await this.deps.core.jobRunner.run(job.id, {
-        ...(options.actor === undefined ? {} : { actor: options.actor }),
-      })
+      // Every non-settled mailbox job takes an exclusive claim before running,
+      // including a claim that represents "no secret". A concurrent duplicate —
+      // with or without a password — therefore fails closed with a generic
+      // conflict instead of running the same job under another request's claim.
+      // The release is owner-token checked in a `finally`, so it can never clear
+      // another claimant's secret or outlive this apply.
+      const claim =
+        flow.usesSecretBroker === true ? this.mailboxSecrets.claim(action.id, secret) : undefined
+      try {
+        await this.deps.core.jobRunner.run(job.id, {
+          ...(options.actor === undefined ? {} : { actor: options.actor }),
+        })
+      } finally {
+        if (claim !== undefined) {
+          this.mailboxSecrets.release(claim)
+        }
+      }
     }
     action = this.deps.core.actions.require(action.id)
     this.appendSuccessEvidence(flow, action)
     return this.view(flow, action.id)
+  }
+
+  /**
+   * Pre-apply gate for a mailbox job. It runs before the durable dispatch fence,
+   * so neither a missing secret nor reconciliation can mutate the engine by
+   * accident.
+   */
+  private async prepareMailboxApply(actionId: string): Promise<void> {
+    this.requireMailboxSecret(actionId)
+    await this.reconcileUnknownMailbox(actionId)
+  }
+
+  /**
+   * Fails a mailbox job closed when the apply needs a password this process does
+   * not hold (for example after a restart). No attempt is reserved and no engine
+   * mutation is possible; the action stays approved and the same request with the
+   * password resumes it.
+   */
+  private requireMailboxSecret(actionId: string): void {
+    const step = this.store.getPlan(actionId)?.enginePlan.steps[0]
+    if (step === undefined || step.kind !== 'mailbox' || step.op === 'noop') {
+      return
+    }
+    if (this.mailboxSecrets.get(actionId) === undefined) {
+      throw new ActionCoreError(
+        'ACTION_BLOCKED',
+        'Mailbox password is required to apply this action and is not available; resubmit with the password',
+        { details: { needsAttention: true, secretRequired: true } },
+      )
+    }
+  }
+
+  /**
+   * Resolves a mailbox action left with an unknown outcome by a process loss
+   * (dispatched attempt, action failed with needsAttention) by re-reading the
+   * engine through the executor's production verifier. A verified mailbox is
+   * completed; otherwise the action stays failed with needsAttention. This only
+   * runs for the interrupted state, so a normal apply is untouched.
+   */
+  private async reconcileUnknownMailbox(actionId: string): Promise<void> {
+    const action = this.deps.core.actions.require(actionId)
+    if (action.status !== 'failed' || action.error?.details?.needsAttention !== true) {
+      return
+    }
+    const attempt = this.deps.core.actionService.getAttempts(actionId).at(-1)
+    if (attempt?.status !== 'unknown') {
+      return
+    }
+    await this.deps.core.actionService.reconcileUnknownAction(actionId)
   }
 
   private async rollback<Request>(

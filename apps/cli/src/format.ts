@@ -83,6 +83,10 @@ export function formatDomainActionView(view: AliasActionView): string {
   return formatOrganizationActionView(view, `Domain:       ${parameterValue(view, 'name')}`)
 }
 
+export function formatMailboxActionView(view: AliasActionView): string {
+  return formatOrganizationActionView(view, `Mailbox:      ${parameterValue(view, 'email')}`)
+}
+
 function parameterValue(view: AliasActionView, key: string): string {
   const value = view.action.parameters[key]
   return value === undefined ? '-' : String(value)

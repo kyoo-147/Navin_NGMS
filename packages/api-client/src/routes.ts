@@ -48,6 +48,12 @@ export const routes = {
         `/control/organization/domains/actions/${segment(actionId)}`,
       rollbackDomain: (actionId: string) =>
         `/control/organization/domains/actions/${segment(actionId)}/rollback`,
+      planMailbox: '/control/organization/mailboxes/plan',
+      mailboxes: '/control/organization/mailboxes',
+      mailboxAction: (actionId: string) =>
+        `/control/organization/mailboxes/actions/${segment(actionId)}`,
+      rollbackMailbox: (actionId: string) =>
+        `/control/organization/mailboxes/actions/${segment(actionId)}/rollback`,
     },
   },
   events: '/events',
