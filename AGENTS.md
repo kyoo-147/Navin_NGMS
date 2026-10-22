@@ -60,3 +60,4 @@ External material is research-only and must remain isolated from required produc
 Product-facing code, contracts, UI, default configuration, release material, and public documentation use Navin-owned vocabulary; external names belong only in isolated research, provenance, license, security-audit, or interoperability records when identification is necessary.
 Every agent, worker, reviewer, and automation task inherits this rule.
 Any violation blocks integration and release until the external path is isolated, replaced, or removed and the owned implementation is independently verified.
+Worker completion is not acceptance: inspect each worker's full diff, independently run the relevant checks, integrate only reviewed output, rerun checks after integration, and clean workers/resources that no longer have a purpose while preserving required evidence and respecting user-controlled panes.

@@ -93,3 +93,24 @@ A change is blocked from integration when any of the following is true:
 - the owned implementation lacks executable tests for the claimed behavior.
 
 **Navin ships its own implementation, with evidence that it works.**
+
+## 9. Worker completion, integration, and cleanup
+
+Worker completion messages are reports, not acceptance evidence.
+
+After every worker finishes, the coordinating agent must:
+
+1. inspect the worker's complete diff and changed-file scope;
+2. verify the result against the assigned contract and acceptance checks;
+3. run the relevant tests, lint, typecheck, build, security, or smoke checks independently;
+4. review provenance, dependency, secret, and product-boundary risks;
+5. integrate only the reviewed change into the owning branch;
+6. rerun the affected checks after integration and record the evidence.
+
+Workers must not be left running or retained without a current purpose.
+
+When a worker is no longer needed, the coordinator must clean up the worker's resources it owns: stop or release the agent, remove temporary panes, remove disposable worktrees and branches after confirming that no unmerged work or required evidence remains, and retain the final report or evidence needed for audit.
+
+User-controlled or owner-inspected workers must not be closed, released, or deleted without explicit confirmation from that owner.
+
+The final coordination report must list retained workers, their current purpose, and the cleanup status of every completed worker.
