@@ -51,3 +51,12 @@ Parallel and sequential execution are both allowed. Independent work does not ne
 - Keep Mail, Control, CLI, daemon, engine adapter, and Desktop boundaries explicit.
 - Never treat mocks, documentation, generated evidence, or an idle worker as proof that a milestone works.
 - Do not run production mutation or automated acceptance against a live deployment from this repository.
+
+## Binding product-ownership rule
+
+Read and apply [`docs/PRODUCT-OWNERSHIP-RULE.md`](docs/PRODUCT-OWNERSHIP-RULE.md) for every task.
+Navin NGMS must remain an independently authored product and must not depend on, copy, translate, decompile into source, vendor, or mechanically adapt another product's core or runtime.
+External material is research-only and must remain isolated from required product paths.
+Product-facing code, contracts, UI, default configuration, release material, and public documentation use Navin-owned vocabulary; external names belong only in isolated research, provenance, license, security-audit, or interoperability records when identification is necessary.
+Every agent, worker, reviewer, and automation task inherits this rule.
+Any violation blocks integration and release until the external path is isolated, replaced, or removed and the owned implementation is independently verified.
