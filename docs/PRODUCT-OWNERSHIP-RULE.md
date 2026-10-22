@@ -1,116 +1,157 @@
-# Navin NGMS - Owned Product and Clean-Room Rule
+# MERAK — NON-NEGOTIABLE PRODUCT OWNERSHIP POLICY
 
-Status: **binding project rule**
+## Rule 0: Merak Is an Independently Engineered Product
 
-Scope: all Navin source code, packages, applications, contracts, tests, runtime configuration, deployment material, documentation, agent tasks, and release artifacts.
+**Priority: Highest — Mandatory for all agents and contributors.**
 
-## 1. Ownership
+Merak is a fully independent email infrastructure and AI-native communication platform developed and owned by Navin Research.
 
-Navin NGMS is our independently authored product.
+This is an architectural requirement, not a branding preference.
 
-Every shipped capability must be implemented, owned, tested, operated, and maintained by Navin.
+### 1. Complete Product Ownership
 
-The product core must not be replaced by, derived from, or dependent on another product's core, engine, daemon, storage system, application source, branding, or distinctive user interface.
+Merak must own and control its complete product architecture, including:
 
-## 2. Clean-room boundary
+- Mail engine and mail-processing logic.
+- Mail transport, delivery and queue management.
+- Mailbox storage and synchronization.
+- Mail protocols and protocol-facing services.
+- Identity, authentication and authorization.
+- Backend services and APIs.
+- Control plane and infrastructure management.
+- Web, desktop and CLI applications.
+- AI agents, tools, workflows and automation.
+- Data models, schemas and state machines.
+- Configuration, monitoring, backup and recovery.
+- Product design system and user experience.
 
-External software, repositories, binaries, applications, and services may be studied only as research material.
+No existing third-party mail server, email application, agent platform or commercial product may become Merak's permanent underlying product core.
 
-Research may establish:
+Generic libraries, operating-system facilities and standards-compliant components may be used only under approved dependency policies. They must not transfer ownership or architectural control of Merak's core to another product.
 
-- observable behavior;
-- protocol and standards compatibility;
-- data and state transitions;
-- failure modes and recovery behavior;
-- security boundaries;
-- interoperability requirements;
-- test scenarios and acceptance evidence.
+Merak's essential functionality must not depend on a proprietary service or another mail product's implementation.
 
-Research findings must be reimplemented independently in Navin.
+### 2. External Software Is Research Material Only
 
-Do not copy, translate, decompile into source, rename, vendor, fork, or mechanically adapt external implementation code into Navin.
+External applications, repositories, engines and platforms may be studied as engineering references.
 
-Reverse-engineering output is evidence and provenance, not a source-code supply chain.
+Permitted research includes:
 
-## 3. Runtime independence
+- Architecture and design principles.
+- Protocol semantics.
+- Algorithms and state machines.
+- Data flow and execution flow.
+- Security mechanisms.
+- Failure handling and recovery strategies.
+- Performance optimization.
+- Product workflows.
+- Testing approaches.
+- UX behavior.
 
-No external product may be required in the Navin product runtime, default deployment, core API, public contract, or mandatory acceptance path.
+Use REA, static analysis, source inspection, protocol documentation and controlled behavioral experiments where authorized.
 
-An external system used as a disposable research fixture must remain isolated from the owned core and must never be presented as Navin functionality.
+The purpose is to understand how problems are solved, not to reproduce another product's implementation.
 
-A research fixture may be used to validate protocol behavior only when the test is clearly marked, local or disposable, and does not make the fixture a product dependency.
+### 3. Independent Implementation Is Mandatory
 
-## 4. Naming and documentation
+The required workflow is:
 
-Product-facing code, API contracts, UI copy, default configuration, operational commands, release notes, and public product documentation use Navin-owned vocabulary.
+**Research → Understand → Abstract → Specify → Redesign → Implement Independently → Verify**
 
-Names of external products are permitted only in isolated research, provenance, license, security-audit, or interoperability records where the name is necessary to identify evidence or a compatibility boundary.
+Research findings must first be converted into an implementation-neutral behavioral specification.
 
-Those records must state the source, version or revision when available, license status, studied scope, limitations, and `code_imported: false`.
+Merak's architecture and source code must then be independently designed against that specification and applicable open standards.
 
-No external product name may be used to imply ownership, endorsement, implementation origin, or a runtime requirement.
+Do not copy, translate, mechanically rewrite, disguise, vendor or import external application source code.
 
-## 5. Dependencies
+Do not treat decompiled output or REA-generated pseudocode as source code that may be transplanted into Merak.
 
-Language runtimes, operating-system primitives, standards, and generic libraries may be used only when they are necessary, explicitly reviewed, and compatible with the repository license and security policy.
+Prefer separation between reference analysis and implementation workers for components with licensing or provenance risks.
 
-A dependency must not become a substitute for an owned product boundary.
+All new core implementations require appropriate tests and evidence of independent development.
 
-Any new dependency requires a license, maintenance, security, and runtime-necessity review before adoption.
+### 4. Merak-Only Product Identity
 
-## 6. Existing and future violations
+All official product-facing materials must present Merak as a standalone Navin Research product.
 
-Any existing adapter, integration, fixture, package, script, or deployment path that violates this rule is classified as `RESEARCH_ONLY` until it is isolated, replaced, or removed.
+This includes:
 
-No milestone, release, or completion report may claim that the owned Navin core is complete while a prohibited external core remains on a required runtime path.
+- Product website and marketing pages.
+- README product overview.
+- Public architecture diagrams.
+- Product descriptions.
+- UI text, screenshots and onboarding.
+- Official feature documentation.
+- Public API and SDK documentation.
+- Product design system.
+- Pitch decks and demonstrations.
 
-When a violation is found:
+Do not describe Merak as a wrapper, fork, clone, rebrand, extension or managed interface for another mail product.
 
-1. stop the affected product claim;
-2. record the exact path and dependency boundary;
-3. isolate the material from the product runtime;
-4. define an owned replacement and its acceptance checks;
-5. verify the replacement independently;
-6. remove the prohibited path before release.
+Do not expose unrelated upstream product names, branding, logos or borrowed identity in Merak's official product experience.
 
-## 7. Agent and worker rule
+Research attribution and external-source evidence belong in restricted internal research records, not in product storytelling.
 
-Every agent, worker, reviewer, and automation task inherits this rule.
+**Legal exception:** Required third-party license notices, copyright notices, SBOM records, provenance and security disclosures must remain accurate and accessible where legally required. Never delete or conceal required attribution.
 
-The coordinating agent must reject a task that proposes copying external code, making a research fixture a product dependency, hiding provenance, or using a third-party name as product identity.
+### 5. No Hidden Core Dependencies
 
-Workers may inspect external material only for the bounded research question assigned to them and must return evidence, limitations, and an independent implementation recommendation.
+Every architectural component must be classified as:
 
-## 8. Release gate
+- Merak-owned implementation.
+- Approved generic dependency.
+- Development-only tool.
+- Research-only reference.
+- Temporary migration component.
 
-A change is blocked from integration when any of the following is true:
+A temporary external engine is not a completed Merak-owned engine.
 
-- product code imports or invokes an unapproved external product core;
-- a required runtime path depends on a research fixture;
-- external implementation code was copied or mechanically translated;
-- public product material presents external work as Navin-owned;
-- provenance, license, or dependency evidence is missing;
-- the owned implementation lacks executable tests for the claimed behavior.
+Temporary dependencies must have an explicit replacement plan, acceptance criteria and retirement milestone.
 
-**Navin ships its own implementation, with evidence that it works.**
+Never declare architectural independence while a critical runtime function still relies on an external product core.
 
-## 9. Worker completion, integration, and cleanup
+### 6. Architecture Authority
 
-Worker completion messages are reports, not acceptance evidence.
+Merak's product requirements and independently approved architecture are authoritative.
 
-After every worker finishes, the coordinating agent must:
+External reference implementations have no authority over Merak's design.
 
-1. inspect the worker's complete diff and changed-file scope;
-2. verify the result against the assigned contract and acceptance checks;
-3. run the relevant tests, lint, typecheck, build, security, or smoke checks independently;
-4. review provenance, dependency, secret, and product-boundary risks;
-5. integrate only the reviewed change into the owning branch;
-6. rerun the affected checks after integration and record the evidence.
+An agent must not:
 
-Workers must not be left running or retained without a current purpose.
+- Change the product architecture to match another repository.
+- Introduce an external engine as a permanent dependency.
+- Import external product source.
+- Add infrastructure solely to imitate another product.
+- Change official branding or identity.
+- Present an unverified implementation as production-ready.
 
-When a worker is no longer needed, the coordinator must clean up the worker's resources it owns: stop or release the agent, remove temporary panes, remove disposable worktrees and branches after confirming that no unmerged work or required evidence remains, and retain the final report or evidence needed for audit.
+Significant architecture changes require a documented proposal, evidence, trade-off analysis and owner approval.
 
-User-controlled or owner-inspected workers must not be closed, released, or deleted without explicit confirmation from that owner.
+### 7. Mandatory Documentation
 
-The final coordination report must list retained workers, their current purpose, and the cleanup status of every completed worker.
+Record this policy in the project's permanent agent instructions.
+
+Ensure product plans, architecture decisions, reference policies and implementation guidance remain consistent with it.
+
+Legacy documents that assume a permanently external mail engine must be reviewed and revised through an explicit architecture decision.
+
+Do not silently erase historical decisions or falsify the current implementation state.
+
+### 8. Verification
+
+Before declaring a milestone complete, verify:
+
+- Ownership of core source and architecture.
+- Runtime dependency boundaries.
+- License and provenance compliance.
+- Product identity consistency.
+- Independently implemented functionality.
+- Protocol conformance.
+- Security and reliability.
+- End-to-end executable evidence.
+
+**Final rule:**
+
+Merak may learn from existing software, but Merak must remain its own product in architecture, implementation, operation, identity and future development.
+
+**No borrowed product core. No disguised source reuse. No architectural lock-in. No false ownership claims.**
